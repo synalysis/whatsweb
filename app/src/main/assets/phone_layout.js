@@ -6,6 +6,12 @@
   }
   window.__whatswebInstalled = true;
 
+  function postHost(payload) {
+    var host = window.WhatswebHost;
+    if (!host || !host.postMessage) return;
+    host.postMessage(JSON.stringify(payload));
+  }
+
   // Moving WhatsApp's own buttons out of their React tree makes a later update throw,
   // and WhatsApp replaces the page with "Unexpected error occurred".
   if (!window.__whatswebDomGuard) {
@@ -409,14 +415,90 @@
     clearLoginAlign();
   }
 
-  function navButton(name) {
-    var wanted = name.toLowerCase();
+  var NAV_KIND = {
+    "chats": "chats",
+    "chat": "chats",
+    "chat-filled": "chats",
+    "wa-chat": "chats",
+    "status": "status",
+    "status-outline": "status",
+    "status-refreshed": "status",
+    "updates": "status",
+    "calls": "calls",
+    "calls-outline": "calls",
+    "phone": "calls",
+    "call": "calls",
+    "new chat": "plus",
+    "new-chat": "plus",
+    "new-chat-outline": "plus",
+    "chat-plus": "plus",
+    "plus": "plus",
+    "meta ai": "meta",
+    "meta-ai": "meta",
+    "ai": "meta",
+    "wds-ic-ai": "meta",
+    "channels": "optional",
+    "channel": "optional",
+    "channels-outline": "optional",
+    "communities": "optional",
+    "community": "optional",
+    "community-outline": "optional",
+    "communities-outline": "optional",
+    "newsletter": "optional",
+    "newsletter-outline": "optional",
+    "media": "optional",
+    "you": "optional",
+    "settings": "optional",
+    "settings-outline": "optional",
+    "settings-refreshed": "optional",
+    "menu": "optional",
+    "more": "optional",
+    "ic-search": "search",
+    "search": "search",
+    "search-refreshed": "search",
+    "back": "back",
+    "arrow-back": "back",
+    "ic-arrow-back": "back",
+    "back-refreshed": "back",
+    "go back": "back"
+  };
+
+  function controlToken(button) {
+    if (!button) return "";
+    var icon = button.querySelector("[data-icon]");
+    if (icon && icon.getAttribute("data-icon")) return icon.getAttribute("data-icon").toLowerCase();
+    var title = button.querySelector("svg title");
+    if (title && title.textContent) return title.textContent.replace(/\s+/g, " ").trim().toLowerCase();
+    var test = (button.getAttribute("data-testid") || "").toLowerCase();
+    if (test) return test;
+    return (button.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  function controlKind(button) {
+    var token = controlToken(button);
+    return token && NAV_KIND[token] ? NAV_KIND[token] : "";
+  }
+
+  function findKind(kind) {
     var buttons = document.querySelectorAll("button, [role='button']");
     for (var i = 0; i < buttons.length; i++) {
-      var label = (buttons[i].getAttribute("aria-label") || "").toLowerCase();
-      if (label === wanted) return buttons[i];
+      if (controlKind(buttons[i]) === kind) return buttons[i];
     }
     return null;
+  }
+
+  function headerIsUnderstood(header) {
+    var buttons = header.querySelectorAll("button, [role='button']");
+    for (var i = 0; i < buttons.length; i++) {
+      if (!controlKind(buttons[i])) return false;
+    }
+    return true;
+  }
+
+  function trackMoved(el) {
+    if (!el) return;
+    var list = window.__whatswebMoved || (window.__whatswebMoved = []);
+    if (list.indexOf(el) === -1) list.push(el);
   }
 
   function rememberHome(el) {
@@ -477,13 +559,13 @@
 
   function park(el, slot) {
     if (!el || !slot) return;
-    var label = (el.getAttribute("aria-label") || "").toLowerCase();
+    var token = controlToken(el);
     var kids = slot.querySelectorAll("button, [role='button']");
     for (var i = 0; i < kids.length; i++) {
-      var kidLabel = (kids[i].getAttribute("aria-label") || "").toLowerCase();
-      if (kids[i] !== el && kidLabel === label) kids[i].remove();
+      if (kids[i] !== el && token && controlToken(kids[i]) === token) kids[i].remove();
     }
     rememberHome(el);
+    trackMoved(el);
     clearMovedStyle(el);
     if (el.parentNode !== slot) slot.appendChild(el);
   }
@@ -503,12 +585,16 @@
   }
 
   function clearBottomNav() {
-    ["chats", "status", "calls", "meta ai", "new chat"].forEach(function (name) {
-      var button = navButton(name);
-      if (!button) return;
-      clearMovedStyle(button);
-      restoreHome(button);
-    });
+    var moved = window.__whatswebMoved || [];
+    var bar = document.getElementById("whatsweb-tabbar");
+    if (!window.__whatswebNavActive && !bar && moved.length === 0) return;
+    for (var i = 0; i < moved.length; i++) {
+      clearMovedStyle(moved[i]);
+      if (moved[i].dataset) delete moved[i].dataset.whatswebBadge;
+      restoreHome(moved[i]);
+    }
+    window.__whatswebMoved = [];
+    window.__whatswebNavActive = false;
     var badges = document.querySelectorAll("[data-whatsweb-badge]");
     for (var i = 0; i < badges.length; i++) {
       clearMovedStyle(badges[i]);
@@ -597,43 +683,43 @@
 
   function placeBottomNav() {
     var header = navRail();
-    if (!header) return;
+    if (!header || !headerIsUnderstood(header)) return false;
+    var chats = findKind("chats");
+    var status = findKind("status");
+    var calls = findKind("calls");
+    if (!chats || !status || !calls) return false;
+    var badge = chatsBadge(chats);
     var bar = ensureBar();
     var side = document.getElementById("side");
     if (side) {
       var bg = window.getComputedStyle(side).backgroundColor;
       if (bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)") bar.style.backgroundColor = bg;
     }
-    ["chats", "status", "calls"].forEach(function (name) {
-      park(navButton(name), bar.querySelector("[data-whatsweb-slot='" + name + "']"));
-    });
-    var chats = navButton("chats");
-    var badge = chatsBadge(chats);
+    park(chats, bar.querySelector("[data-whatsweb-slot='chats']"));
+    park(status, bar.querySelector("[data-whatsweb-slot='status']"));
+    park(calls, bar.querySelector("[data-whatsweb-slot='calls']"));
     var chatsSlot = bar.querySelector("[data-whatsweb-slot='chats']");
     if (badge && chatsSlot) {
       rememberHome(badge);
+      trackMoved(badge);
       badge.dataset.whatswebBadge = "1";
       if (badge.parentNode !== chatsSlot) chatsSlot.appendChild(badge);
     }
     var fabs = bar.querySelector("[data-whatsweb-slot='fabs']");
-    var meta = navButton("meta ai");
-    var plus = navButton("new chat");
-    park(meta, fabs);
-    park(plus, fabs);
+    var meta = findKind("meta");
+    var plus = findKind("plus");
+    if (meta) park(meta, fabs);
+    if (plus) park(plus, fabs);
     if (meta && plus && meta.parentNode === fabs && plus.parentNode === fabs && meta.nextSibling !== plus) {
       fabs.appendChild(meta);
       fabs.appendChild(plus);
     }
-    ["channels", "communities", "media", "you"].forEach(function (name) {
-      var extra = navButton(name);
-      if (!extra) return;
-      extra.dataset.whatswebNavhide = "1";
-      extra.style.display = "none";
-    });
     header.dataset.whatswebNav = "1";
+    window.__whatswebNavActive = true;
     collapseChatColumn();
     padList();
     watchNav(header);
+    return true;
   }
 
   function watchNav(header) {
@@ -652,7 +738,7 @@
     }
     observer.disconnect();
     if (header) observer.observe(header, { childList: true, subtree: true });
-    var plus = navButton("new chat");
+    var plus = findKind("plus");
     var plusHome = plus && plus.__whatswebParent;
     if (plusHome && plusHome !== header && header && !header.contains(plusHome)) {
       observer.observe(plusHome, { childList: true });
@@ -664,7 +750,7 @@
     var pane = window.__whatswebPhone && document.documentElement.dataset.pane === "chat" ? "chat" : "list";
     if (pane === reportedPane) return;
     reportedPane = pane;
-    if (window.WhatswebBridge && window.WhatswebBridge.onPane) window.WhatswebBridge.onPane(pane);
+    postHost({ type: "pane", pane: pane });
   }
 
   function layoutPanes() {
@@ -706,7 +792,7 @@
         fills[f].style.minWidth = "0px";
         fills[f].style.flex = "1 1 auto";
       }
-      placeBottomNav();
+      if (!placeBottomNav()) clearBottomNav();
     } else {
       clearBottomNav();
       [list, chat].forEach(function (el) {
@@ -752,7 +838,7 @@
     else if (document.querySelector("[data-testid='wa-logo']") || document.querySelector("#app canvas")) linked = false;
     if (linked === null || linked === lastLinked) return;
     lastLinked = linked;
-    if (window.WhatswebBridge) window.WhatswebBridge.onSession(linked);
+    postHost({ type: "session", linked: linked });
   }
 
   function hideDownloadBanner() {
@@ -794,8 +880,7 @@
     var menuRight = -1;
     for (var b = 0; b < buttons.length; b++) {
       var button = buttons[b];
-      var icon = button.querySelector("svg title");
-      if (icon && icon.textContent === "ic-search") button.dataset.whatswebChatSearch = "1";
+      if (controlKind(button) === "search") button.dataset.whatswebChatSearch = "1";
       var rect = button.getBoundingClientRect();
       if (button.dataset.whatswebChatSearch || rect.width < 8 || rect.right <= menuRight) continue;
       menu = button;
@@ -897,8 +982,7 @@
     if (document.documentElement.dataset.opening) delete document.documentElement.dataset.opening;
     var button = target.closest("button, [role='button']");
     if (chat && button && chat.contains(button)) {
-      var label = (button.getAttribute("aria-label") || "").toLowerCase();
-      if (label.indexOf("back") !== -1 && window.whatswebBack) window.whatswebBack();
+      if (controlKind(button) === "back" && window.whatswebBack) window.whatswebBack();
     }
   }, true);
 

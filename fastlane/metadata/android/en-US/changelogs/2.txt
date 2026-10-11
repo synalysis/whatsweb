@@ -1,0 +1,1 @@
+The companion stays behind the app lock until this device is unlocked. Downloads keep a size limit, clearing the link waits until the session is actually removed, and a stopped page can be opened again. The phone layout keeps WhatsApp's own navigation when its controls cannot be recognized.

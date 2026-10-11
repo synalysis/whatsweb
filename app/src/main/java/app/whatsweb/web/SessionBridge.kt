@@ -1,23 +1,17 @@
 package app.whatsweb.web
 
-import android.os.Handler
-import android.os.Looper
-import android.webkit.JavascriptInterface
 import app.whatsweb.ui.AppState
 
 class SessionBridge(
     private val state: AppState,
 ) {
-    private val main = Handler(Looper.getMainLooper())
-
-    @JavascriptInterface
-    fun onPane(pane: String) {
-        if (pane != "list" && pane != "chat") return
-        main.post { state.pane = pane }
-    }
-
-    @JavascriptInterface
-    fun onSession(linked: Boolean) {
-        main.post { state.linked = linked }
+    internal fun onMessage(message: HostMessages.Message) {
+        when (message) {
+            is HostMessages.Message.Pane -> {
+                if (message.pane == "list" || message.pane == "chat") state.pane = message.pane
+            }
+            is HostMessages.Message.Session -> state.linked = message.linked
+            else -> Unit
+        }
     }
 }

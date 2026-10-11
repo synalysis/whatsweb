@@ -1,6 +1,8 @@
 package app.whatsweb.ui.browser
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebStorage
@@ -159,11 +161,17 @@ fun BrowserScreen(
                 }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                if (webMissing) {
+                if (webMissing || state.rendererGone) {
                     MessagePane(
-                        text = stringResource(R.string.error_webview_missing),
-                        action = null,
-                        onAction = {},
+                        text = stringResource(
+                            if (webMissing) R.string.error_webview_missing else R.string.error_page_stopped,
+                        ),
+                        action = if (state.rendererGone && !webMissing) {
+                            stringResource(R.string.error_retry)
+                        } else {
+                            null
+                        },
+                        onAction = { state.rendererGone = false },
                     )
                 } else {
                     AndroidView(
@@ -179,12 +187,12 @@ fun BrowserScreen(
                                         context = context,
                                         state = state,
                                         host = host,
+                                        slot = webSlot,
                                         phoneLayout = { prefs.phoneLayout },
                                         quietFrame = { true },
                                         textZoom = prefs.textZoom,
                                     ).also { created ->
                                         created.setBackgroundColor(pageColor)
-                                        webSlot.view = created
                                         val restored = savedState?.let { created.restoreState(it) } != null
                                         val pending = state.pendingUrl
                                         state.pendingUrl = null
@@ -194,7 +202,7 @@ fun BrowserScreen(
                                         }
                                     }
                                 } catch (_: Exception) {
-                                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    Handler(Looper.getMainLooper()).post {
                                         webMissing = true
                                     }
                                     android.view.View(context)
@@ -203,6 +211,9 @@ fun BrowserScreen(
                         },
                         update = { view ->
                             (view as? WebView)?.settings?.textZoom = prefs.textZoom
+                        },
+                        onRelease = { released ->
+                            if (released is WebView) webSlot.detach(released)
                         },
                     )
                     if (state.mainFrameError) {
@@ -230,14 +241,14 @@ fun BrowserScreen(
                             )
                         }
                     }
-                    IconButton(
-                        onClick = onOpenSettings,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 8.dp, end = 4.dp),
-                    ) {
-                        Icon(Icons.Filled.Settings, stringResource(R.string.cd_settings))
-                    }
+                }
+                IconButton(
+                    onClick = onOpenSettings,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 4.dp),
+                ) {
+                    Icon(Icons.Filled.Settings, stringResource(R.string.cd_settings))
                 }
             }
         }
@@ -275,10 +286,18 @@ private fun MessagePane(
 }
 
 fun clearCompanionSession(view: WebView?) {
-    CookieManager.getInstance().removeAllCookies(null)
-    CookieManager.getInstance().flush()
-    WebStorage.getInstance().deleteAllData()
-    view?.clearCache(true)
-    view?.clearHistory()
-    view?.loadUrl(LinkRouter.HOME)
+    val main = Handler(Looper.getMainLooper())
+    CookieManager.getInstance().removeAllCookies {
+        main.post {
+            CookieManager.getInstance().flush()
+            WebStorage.getInstance().deleteAllData()
+            if (view == null) return@post
+            try {
+                view.clearCache(true)
+                view.clearHistory()
+                view.loadUrl(LinkRouter.HOME)
+            } catch (_: Exception) {
+            }
+        }
+    }
 }

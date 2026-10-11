@@ -28,6 +28,7 @@
     <string name="error_offline">The companion can\'t be reached right now.</string>
     <string name="error_retry">Try again</string>
     <string name="error_webview_missing">This phone has no WebView, so the companion can\'t be shown.</string>
+    <string name="error_page_stopped">The companion stopped. Try again.</string>
     <string name="error_recovered">WhatsApp sent this phone back to its website. Opening the companion again.</string>
 
     <string name="share_ready">Shared text is ready to paste into a chat.</string>

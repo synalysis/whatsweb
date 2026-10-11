@@ -64,6 +64,9 @@ fun WhatswebApp(
     val context = LocalContext.current
     val lockUnavailable = stringResource(R.string.lock_unavailable)
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(locked) {
+        if (locked) showSettings = false
+    }
 
     SideEffect {
         val window = (context as Activity).window
@@ -80,7 +83,9 @@ fun WhatswebApp(
     }
 
     Box(Modifier.fillMaxSize()) {
-    if (prefs.welcomeDone) {
+    if (!prefs.welcomeDone) {
+        WelcomeScreen(onContinue = prefs::completeWelcome)
+    } else if (!locked) {
         BrowserScreen(
             prefs = prefs,
             state = state,
@@ -91,11 +96,9 @@ fun WhatswebApp(
             onOpenSettings = { showSettings = true },
             onLeave = onLeave,
         )
-    } else {
-        WelcomeScreen(onContinue = prefs::completeWelcome)
     }
 
-    if (showSettings && prefs.welcomeDone) {
+    if (showSettings && prefs.welcomeDone && !locked) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ModalBottomSheet(
             onDismissRequest = { showSettings = false },

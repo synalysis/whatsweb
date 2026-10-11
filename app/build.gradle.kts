@@ -1,7 +1,21 @@
+import org.gradle.api.GradleException
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+val releaseKeystore = System.getenv("WHATSWEB_KEYSTORE")
+val releaseStorePassword = System.getenv("WHATSWEB_KEYSTORE_PASSWORD")
+val releaseKeyAlias = System.getenv("WHATSWEB_KEY_ALIAS")
+val releaseKeyPassword = System.getenv("WHATSWEB_KEY_PASSWORD")
+val releaseSigningValues = listOf(releaseKeystore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
+val releaseSigningConfigured = releaseSigningValues.all { !it.isNullOrBlank() }
+if (releaseSigningValues.any { !it.isNullOrBlank() } && !releaseSigningConfigured) {
+    throw GradleException(
+        "Release signing requires WHATSWEB_KEYSTORE, WHATSWEB_KEYSTORE_PASSWORD, WHATSWEB_KEY_ALIAS, and WHATSWEB_KEY_PASSWORD.",
+    )
 }
 
 android {
@@ -12,18 +26,17 @@ android {
         applicationId = "app.whatsweb"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     signingConfigs {
-        create("release") {
-            val store = System.getenv("WHATSWEB_KEYSTORE")
-            if (!store.isNullOrBlank()) {
-                storeFile = file(store)
-                storePassword = System.getenv("WHATSWEB_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("WHATSWEB_KEY_ALIAS")
-                keyPassword = System.getenv("WHATSWEB_KEY_PASSWORD")
+        if (releaseSigningConfigured) {
+            create("release") {
+                storeFile = file(releaseKeystore!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
             }
         }
     }
@@ -36,12 +49,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // F-Droid strips this signature and signs the rebuild. A local
-            // keystore is used only when the WHATSWEB_KEYSTORE env vars are set.
-            signingConfig = if (System.getenv("WHATSWEB_KEYSTORE").isNullOrBlank()) {
-                signingConfigs.getByName("debug")
-            } else {
-                signingConfigs.getByName("release")
+            // Unsigned unless every release signing variable is set. F-Droid
+            // signs that APK itself; CI uses the project keystore.
+            if (releaseSigningConfigured) {
+                signingConfig = signingConfigs.getByName("release")
             }
         }
     }

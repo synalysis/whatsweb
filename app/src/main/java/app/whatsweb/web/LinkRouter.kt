@@ -21,34 +21,53 @@ object LinkRouter {
         data object Drop : Route
     }
 
-    fun route(raw: String): Route {
+    fun route(raw: String, external: Boolean = false): Route {
         val uri = try {
             URI(raw.trim())
         } catch (_: Exception) {
             return Route.Drop
         }
+        if (uri.userInfo != null) return Route.Drop
         val scheme = uri.scheme?.lowercase() ?: return Route.Drop
-        if (scheme == "about" || scheme == "blob" || scheme == "data") return Route.Stay
+        if (!external && (scheme == "about" || scheme == "blob" || scheme == "data")) return Route.Stay
         if (scheme != "http" && scheme != "https") return Route.Drop
+        if (!isDefaultPort(uri)) return Route.Drop
 
         val host = uri.host?.lowercase()?.trim('.') ?: return Route.Drop
         if (host == COMPANION_HOST) {
             return if (scheme == "https") Route.Stay else Route.Translate(toHttps(uri))
         }
-        if (host == "whatsapp.com" || host == "www.whatsapp.com") return Route.Recover
+        if (!external && (host == "whatsapp.com" || host == "www.whatsapp.com")) return Route.Recover
 
         translate(host, uri)?.let { return Route.Translate(it) }
-        return Route.External(raw.trim())
+        return if (external) Route.Drop else Route.External(raw.trim())
     }
 
     fun isCompanionPage(raw: String?): Boolean {
         if (raw.isNullOrBlank()) return false
-        val host = try {
-            URI(raw).host
+        val uri = try {
+            URI(raw.trim())
         } catch (_: Exception) {
             return false
         }
-        return host.equals(COMPANION_HOST, ignoreCase = true)
+        if (uri.userInfo != null || !isDefaultPort(uri)) return false
+        if (!uri.scheme.equals("https", ignoreCase = true)) return false
+        val host = uri.host?.lowercase()?.trim('.') ?: return false
+        return host == COMPANION_HOST
+    }
+
+    fun isTrustedCompanionOrigin(raw: String?): Boolean {
+        return isCompanionPage(raw)
+    }
+
+    private fun isDefaultPort(uri: URI): Boolean {
+        val port = uri.port
+        if (port == -1) return true
+        return when (uri.scheme?.lowercase()) {
+            "https" -> port == 443
+            "http" -> port == 80
+            else -> false
+        }
     }
 
     private fun translate(host: String, uri: URI): String? {

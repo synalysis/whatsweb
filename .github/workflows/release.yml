@@ -52,7 +52,24 @@ jobs:
           WHATSWEB_KEYSTORE_PASSWORD: ${{ secrets.WHATSWEB_KEYSTORE_PASSWORD }}
           WHATSWEB_KEY_ALIAS: ${{ secrets.WHATSWEB_KEY_ALIAS }}
           WHATSWEB_KEY_PASSWORD: ${{ secrets.WHATSWEB_KEY_PASSWORD }}
-        run: ./gradlew test assembleRelease --no-daemon
+        run: ./gradlew test lintRelease assembleRelease --no-daemon
+
+      - name: Check tag matches versionName
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          aapt="$(find "$sdk/build-tools" -type f -name aapt | sort | tail -n 1)"
+          if [ -z "$aapt" ]; then
+            echo "aapt was not found under $sdk/build-tools"
+            exit 1
+          fi
+          badging="$("$aapt" dump badging app/build/outputs/apk/release/app-release.apk)"
+          name="$(printf '%s\n' "$badging" | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")"
+          if [ "$name" != "$tag" ]; then
+            echo "Tag v$tag does not match embedded versionName '$name'"
+            exit 1
+          fi
 
       - name: Publish GitHub release
         env:

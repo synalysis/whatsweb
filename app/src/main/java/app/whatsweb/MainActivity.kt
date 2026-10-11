@@ -2,11 +2,14 @@ package app.whatsweb
 
 import android.Manifest
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.webkit.CookieManager
@@ -36,12 +39,13 @@ import app.whatsweb.prefs.UserPreferences
 import app.whatsweb.ui.AppState
 import app.whatsweb.ui.WebSlot
 import app.whatsweb.ui.WhatswebApp
-import app.whatsweb.ui.browser.clearCompanionSession
 import app.whatsweb.ui.theme.WhatswebTheme
 import app.whatsweb.web.LinkRouter
 import app.whatsweb.web.MediaStoreSaver
 import app.whatsweb.web.WebHost
-import java.io.ByteArrayOutputStream
+import java.util.ArrayDeque
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 
 class MainActivity : AppCompatActivity() {
     private val prefs by lazy { UserPreferences(this) }
@@ -49,10 +53,18 @@ class MainActivity : AppCompatActivity() {
     private val webSlot = WebSlot()
     private var locked by mutableStateOf(false)
     private var lastLeaveAttempt = 0L
+    private val io = Executors.newSingleThreadExecutor()
+    private val mainThread = Handler(Looper.getMainLooper())
 
     private var uploadCallback: ValueCallback<Array<Uri>>? = null
-    private var pendingPermission: PermissionRequest? = null
-    private var pendingGrant: Array<String>? = null
+    private var permissionsOpen = true
+    private val permissionQueue = ArrayDeque<PermissionWait>()
+
+    private val lockObserver = object : DefaultLifecycleObserver {
+        override fun onStop(owner: LifecycleOwner) {
+            if (prefs.appLock && prefs.welcomeDone) locked = true
+        }
+    }
 
     private val fileChooser = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -65,12 +77,9 @@ class MainActivity : AppCompatActivity() {
     private val runtimePermissions = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { granted ->
-        val request = pendingPermission
-        val resources = pendingGrant
-        pendingPermission = null
-        pendingGrant = null
-        if (request == null || resources == null) return@registerForActivityResult
-        if (granted.values.all { it }) request.grant(resources) else request.deny()
+        if (!permissionsOpen) return@registerForActivityResult
+        val wait = permissionQueue.pollFirst() ?: return@registerForActivityResult
+        if (granted.isNotEmpty() && granted.values.all { it }) wait.onGranted() else wait.onDenied()
     }
 
     private lateinit var host: WebHost
@@ -87,14 +96,12 @@ class MainActivity : AppCompatActivity() {
             openExternal = ::openExternal,
             openFileChooser = ::openFileChooser,
             requestWebPermissions = ::requestWebPermissions,
+            requestLegacyStorage = ::requestLegacyStorage,
             message = { text -> state.notice = text },
+            onRendererGone = webSlot::destroy,
         )
         consumeIntent(intent)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                if (prefs.appLock && prefs.welcomeDone) locked = true
-            }
-        })
+        ProcessLifecycleOwner.get().lifecycle.addObserver(lockObserver)
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
             WhatswebTheme(dynamicColor = prefs.dynamicColor) {
@@ -121,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                         state.linked = null
                         state.pane = "list"
                         state.pageTitle = null
-                        clearCompanionSession(webSlot.view)
+                        app.whatsweb.ui.browser.clearCompanionSession(webSlot.view)
                     },
                     canUseLock = ::canUseLock,
                 )
@@ -149,6 +156,24 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         webSlot.view?.saveState(outState)
+    }
+
+    override fun onDestroy() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(lockObserver)
+        permissionsOpen = false
+        val pending = permissionQueue.toList()
+        permissionQueue.clear()
+        uploadCallback?.onReceiveValue(null)
+        uploadCallback = null
+        webSlot.destroyCurrent()
+        pending.forEach { wait ->
+            try {
+                wait.onDenied()
+            } catch (_: Exception) {
+            }
+        }
+        io.shutdown()
+        super.onDestroy()
     }
 
     private fun changeTheme(mode: ThemeMode) {
@@ -236,10 +261,50 @@ class MainActivity : AppCompatActivity() {
             request.grant(grant)
             return
         }
-        pendingPermission?.deny()
-        pendingPermission = request
-        pendingGrant = grant
-        runtimePermissions.launch(needed.toTypedArray())
+        requestPermissions(
+            needed.toTypedArray(),
+            onGranted = { request.grant(grant) },
+            onDenied = { request.deny() },
+        )
+    }
+
+    private fun requestLegacyStorage(onGranted: () -> Unit, onDenied: () -> Unit) {
+        if (!needsLegacyStoragePermission()) {
+            onGranted()
+            return
+        }
+        requestPermissions(
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            onGranted,
+            onDenied,
+        )
+    }
+
+    private fun needsLegacyStoragePermission(): Boolean {
+        return Build.VERSION.SDK_INT <= 28 &&
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            ) != PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermissions(
+        permissions: Array<String>,
+        onGranted: () -> Unit,
+        onDenied: () -> Unit,
+    ) {
+        if (!permissionsOpen) {
+            onDenied()
+            return
+        }
+        val wait = PermissionWait(onGranted, onDenied)
+        permissionQueue.addLast(wait)
+        try {
+            runtimePermissions.launch(permissions)
+        } catch (_: Exception) {
+            permissionQueue.remove(wait)
+            onDenied()
+        }
     }
 
     private fun openExternal(url: String) {
@@ -256,10 +321,10 @@ class MainActivity : AppCompatActivity() {
             Intent.ACTION_VIEW -> {
                 val data = intent.dataString
                 if (data != null) {
-                    state.pendingUrl = when (val route = LinkRouter.route(data)) {
-                        is LinkRouter.Route.Translate -> route.url
-                        LinkRouter.Route.Stay -> data
-                        else -> state.pendingUrl
+                    when (val route = LinkRouter.route(data, external = true)) {
+                        is LinkRouter.Route.Translate -> state.pendingUrl = route.url
+                        LinkRouter.Route.Stay -> state.pendingUrl = data
+                        else -> Unit
                     }
                 }
             }
@@ -273,54 +338,64 @@ class MainActivity : AppCompatActivity() {
             state.sharedText = it
         }
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
-        val name = displayName(uri)
-        val mime = contentResolver.getType(uri) ?: "application/octet-stream"
-        val bytes = try {
-            contentResolver.openInputStream(uri)?.use { input ->
-                val output = ByteArrayOutputStream()
-                val buffer = ByteArray(8192)
-                var total = 0
-                while (true) {
-                    val read = input.read(buffer)
-                    if (read < 0) break
-                    total += read
-                    if (total > MAX_SHARE_BYTES) {
-                        state.notice = getString(R.string.download_too_large)
-                        return
-                    }
-                    output.write(buffer, 0, read)
-                }
-                output.toByteArray()
+        val appContext = applicationContext
+        val save = {
+            try {
+                io.execute { saveShared(appContext, uri) }
+            } catch (_: RejectedExecutionException) {
             }
+        }
+        requestLegacyStorage(onGranted = save, onDenied = save)
+    }
+
+    private fun saveShared(context: Context, uri: Uri) {
+        val name = displayName(context, uri)
+        val mime = try {
+            context.contentResolver.getType(uri) ?: "application/octet-stream"
         } catch (_: Exception) {
-            null
+            "application/octet-stream"
         }
-        if (bytes == null) {
-            state.notice = getString(R.string.share_failed)
-            return
+        val result = try {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                MediaStoreSaver.save(context, name, mime, input, MAX_SHARE_BYTES)
+            } ?: MediaStoreSaver.Result.Failed
+        } catch (_: Exception) {
+            MediaStoreSaver.Result.Failed
         }
-        val result = MediaStoreSaver.save(this, name, mime, bytes)
-        state.notice = getString(
+        val message = context.getString(
             when (result) {
                 MediaStoreSaver.Result.PublicDownloads -> R.string.share_saved
                 MediaStoreSaver.Result.AppFolder -> R.string.share_saved_private
+                MediaStoreSaver.Result.TooLarge -> R.string.download_too_large
                 MediaStoreSaver.Result.Failed -> R.string.share_failed
             },
         )
+        mainThread.post {
+            if (!isDestroyed) state.notice = message
+        }
     }
 
-    private fun displayName(uri: Uri): String {
-        val cursor = contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (index >= 0) return it.getString(index) ?: "shared"
+    private fun displayName(context: Context, uri: Uri): String {
+        return try {
+            val cursor = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (index >= 0) return it.getString(index) ?: "shared"
+                }
             }
+            "shared"
+        } catch (_: Exception) {
+            "shared"
         }
-        return "shared"
     }
+
+    private data class PermissionWait(
+        val onGranted: () -> Unit,
+        val onDenied: () -> Unit,
+    )
 
     private companion object {
-        const val MAX_SHARE_BYTES = 60 * 1024 * 1024
+        const val MAX_SHARE_BYTES = 60L * 1024 * 1024
     }
 }
