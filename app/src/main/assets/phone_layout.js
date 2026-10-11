@@ -419,18 +419,23 @@
     "chats": "chats",
     "chat": "chats",
     "chat-filled": "chats",
+    "wds-ic-chat-filled": "chats",
+    "wds-ic-chat": "chats",
     "wa-chat": "chats",
     "status": "status",
     "status-outline": "status",
     "status-refreshed": "status",
+    "wds-ic-status": "status",
     "updates": "status",
     "calls": "calls",
     "calls-outline": "calls",
     "phone": "calls",
     "call": "calls",
+    "ic-call": "calls",
     "new chat": "plus",
     "new-chat": "plus",
     "new-chat-outline": "plus",
+    "wds-ic-new-chat-filled": "plus",
     "chat-plus": "plus",
     "plus": "plus",
     "meta ai": "meta",
@@ -440,10 +445,12 @@
     "channels": "optional",
     "channel": "optional",
     "channels-outline": "optional",
+    "wds-ic-channels": "optional",
     "communities": "optional",
     "community": "optional",
     "community-outline": "optional",
     "communities-outline": "optional",
+    "wds-ic-communities": "optional",
     "newsletter": "optional",
     "newsletter-outline": "optional",
     "media": "optional",
@@ -453,6 +460,8 @@
     "settings-refreshed": "optional",
     "menu": "optional",
     "more": "optional",
+    "ic-more-vert": "optional",
+    "ic-filter": "optional",
     "ic-search": "search",
     "search": "search",
     "search-refreshed": "search",
@@ -463,20 +472,28 @@
     "go back": "back"
   };
 
-  function controlToken(button) {
-    if (!button) return "";
-    var icon = button.querySelector("[data-icon]");
-    if (icon && icon.getAttribute("data-icon")) return icon.getAttribute("data-icon").toLowerCase();
-    var title = button.querySelector("svg title");
-    if (title && title.textContent) return title.textContent.replace(/\s+/g, " ").trim().toLowerCase();
-    var test = (button.getAttribute("data-testid") || "").toLowerCase();
-    if (test) return test;
-    return (button.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().toLowerCase();
+  function controlTokens(button) {
+    var tokens = [];
+    function add(value) {
+      var token = String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+      if (token && tokens.indexOf(token) < 0) tokens.push(token);
+    }
+    if (!button) return tokens;
+    add(button.getAttribute("aria-label"));
+    var icons = button.querySelectorAll("[data-icon]");
+    for (var i = 0; i < icons.length; i++) add(icons[i].getAttribute("data-icon"));
+    var titles = button.querySelectorAll("svg title");
+    for (var t = 0; t < titles.length; t++) add(titles[t].textContent);
+    add(button.getAttribute("data-testid"));
+    return tokens;
   }
 
   function controlKind(button) {
-    var token = controlToken(button);
-    return token && NAV_KIND[token] ? NAV_KIND[token] : "";
+    var tokens = controlTokens(button);
+    for (var i = 0; i < tokens.length; i++) {
+      if (NAV_KIND[tokens[i]]) return NAV_KIND[tokens[i]];
+    }
+    return "";
   }
 
   function findKind(kind) {
@@ -485,14 +502,6 @@
       if (controlKind(buttons[i]) === kind) return buttons[i];
     }
     return null;
-  }
-
-  function headerIsUnderstood(header) {
-    var buttons = header.querySelectorAll("button, [role='button']");
-    for (var i = 0; i < buttons.length; i++) {
-      if (!controlKind(buttons[i])) return false;
-    }
-    return true;
   }
 
   function trackMoved(el) {
@@ -559,10 +568,10 @@
 
   function park(el, slot) {
     if (!el || !slot) return;
-    var token = controlToken(el);
+    var kind = controlKind(el);
     var kids = slot.querySelectorAll("button, [role='button']");
     for (var i = 0; i < kids.length; i++) {
-      if (kids[i] !== el && token && controlToken(kids[i]) === token) kids[i].remove();
+      if (kids[i] !== el && kind && kind !== "optional" && controlKind(kids[i]) === kind) kids[i].remove();
     }
     rememberHome(el);
     trackMoved(el);
@@ -683,7 +692,7 @@
 
   function placeBottomNav() {
     var header = navRail();
-    if (!header || !headerIsUnderstood(header)) return false;
+    if (!header) return false;
     var chats = findKind("chats");
     var status = findKind("status");
     var calls = findKind("calls");
