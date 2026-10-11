@@ -4,7 +4,13 @@ WhatsWeb does not run an account system, analytics, advertising, or a crash-repo
 
 The companion page is the official WhatsApp Web site, loaded in the system WebView. Whatever that site stores (the linked-device session, cookies, and page data) stays in this app's private storage on the phone. Android backup and device-to-device transfer of that storage are turned off.
 
-Clearing the link in settings deletes those cookies and the WebView storage, then loads the companion page again so it can be linked with a new code.
+## Delete your data
+
+WhatsWeb keeps the linked session only on this phone. To delete it, open the app, open settings, and choose **Clear this link**. That signs the companion out and deletes the cookies and the page data stored by the app.
+
+Files already saved into the system Downloads collection stay there until you delete them yourself.
+
+There is no WhatsWeb account and no copy of your chats on a WhatsWeb server. Deleting the WhatsApp account, or chats stored by WhatsApp, is done in the WhatsApp app.
 
 Optional app lock uses Android's biometric prompt. WhatsWeb never receives a fingerprint, face, or device PIN. It only learns whether the device accepted the unlock.
 
