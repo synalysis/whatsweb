@@ -13,7 +13,7 @@ version_code=$(sed -n 's/^[[:space:]]*versionCode = \([0-9][0-9]*\).*/\1/p' "$gr
 
 if [ -z "$version_name" ] || [ -z "$version_code" ]; then
   echo "Could not read versionName and versionCode from $gradle." >&2
-  echo "versionName has to look like 1.0.1 so the tag matches the release workflow." >&2
+  echo "versionName has to look like 1.0.2 so the tag matches the release workflow." >&2
   exit 1
 fi
 

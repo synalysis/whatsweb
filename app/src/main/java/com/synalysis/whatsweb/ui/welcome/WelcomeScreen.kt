@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,8 +37,13 @@ fun WelcomeScreen(
     onContinue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Surface(
+        modifier = modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+    ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 32.dp),
@@ -80,6 +86,7 @@ fun WelcomeScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+    }
 }
 
 @Composable
@@ -97,7 +104,11 @@ private fun Point(icon: ImageVector, title: Int, body: Int) {
         )
         Spacer(Modifier.width(14.dp))
         Column {
-            Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
             Spacer(Modifier.height(2.dp))
             Text(
                 stringResource(body),
