@@ -45,6 +45,7 @@ fun createCompanionWebView(
     slot: WebSlot,
     phoneLayout: () -> Boolean,
     quietFrame: () -> Boolean,
+    hideAi: () -> Boolean,
     textZoom: Int,
 ): WebView {
     val chromeVersion = DesktopIdentity.chromeVersion(
@@ -211,7 +212,7 @@ fun createCompanionWebView(
             override fun onPageFinished(view: WebView, url: String?) {
                 if (!LinkRouter.isCompanionPage(url)) return
                 view.evaluateJavascript(
-                    "window.__whatswebPhone = ${phoneLayout()};\nwindow.__whatswebQuiet = ${quietFrame()};\n${tabLabelScript(view.context)}\n$layout",
+                    "window.__whatswebPhone = ${phoneLayout()};\nwindow.__whatswebQuiet = ${quietFrame()};\nwindow.__whatswebHideAi = ${hideAi()};\n${tabLabelScript(view.context)}\n$layout",
                     null,
                 )
             }

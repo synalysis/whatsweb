@@ -44,6 +44,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">تخطيط الهاتف</string>
     <string name="pref_phone_layout_hint">عرض قائمة الدردشات أو المحادثة.</string>
+    <string name="pref_hide_ai">إخفاء أيقونة الذكاء الاصطناعي</string>
+    <string name="pref_hide_ai_hint">يزيل زر Meta AI من الشاشة.</string>
     <string name="pref_dynamic">ألوان الخلفية</string>
     <string name="pref_dynamic_hint">يلوّن الإطار من خلفية الشاشة. المحادثة تُبقي سمة واتساب الخاصة.</string>
     <string name="pref_theme">الإطار</string>

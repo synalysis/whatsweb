@@ -44,6 +44,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">電話レイアウト</string>
     <string name="pref_phone_layout_hint">チャット一覧か会話のどちらかを表示します。</string>
+    <string name="pref_hide_ai">AIアイコンを隠す</string>
+    <string name="pref_hide_ai_hint">Meta AI のボタンを画面から外します。</string>
     <string name="pref_dynamic">壁紙の色</string>
     <string name="pref_dynamic_hint">枠の色を壁紙から取ります。会話は WhatsApp 自身のテーマのままです。</string>
     <string name="pref_theme">枠</string>

@@ -2,6 +2,7 @@
   if (window.__whatswebInstalled) {
     if (window.whatswebSetPhone) window.whatswebSetPhone(!!window.__whatswebPhone);
     if (window.whatswebSetQuiet) window.whatswebSetQuiet(!!window.__whatswebQuiet);
+    if (window.whatswebSetHideAi) window.whatswebSetHideAi(!!window.__whatswebHideAi);
     return true;
   }
   window.__whatswebInstalled = true;
@@ -800,11 +801,20 @@
     var fabs = bar.querySelector("[data-whatsweb-slot='fabs']");
     var meta = findKind("meta");
     var plus = findKind("plus");
-    if (meta) park(meta, fabs);
     if (plus) park(plus, fabs);
-    if (meta && plus && meta.parentNode === fabs && plus.parentNode === fabs && meta.nextSibling !== plus) {
-      fabs.appendChild(meta);
-      fabs.appendChild(plus);
+    if (meta && window.__whatswebHideAi) {
+      meta.style.setProperty("display", "none", "important");
+      meta.dataset.whatswebHideAi = "1";
+    } else if (meta) {
+      if (meta.dataset.whatswebHideAi) {
+        meta.style.display = "";
+        delete meta.dataset.whatswebHideAi;
+      }
+      park(meta, fabs);
+      if (plus && meta.parentNode === fabs && plus.parentNode === fabs && meta.nextSibling !== plus) {
+        fabs.appendChild(meta);
+        fabs.appendChild(plus);
+      }
     }
     header.dataset.whatswebNav = "1";
     window.__whatswebNavActive = true;
@@ -1329,6 +1339,11 @@
       if (controlKind(button) === "back" && window.whatswebBack) window.whatswebBack();
     }
   }, true);
+
+  window.whatswebSetHideAi = function (hide) {
+    window.__whatswebHideAi = !!hide;
+    apply();
+  };
 
   window.whatswebSetQuiet = function (quiet) {
     window.__whatswebQuiet = !!quiet;

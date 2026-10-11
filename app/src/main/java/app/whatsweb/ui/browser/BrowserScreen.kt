@@ -87,6 +87,12 @@ fun BrowserScreen(
             null,
         )
     }
+    LaunchedEffect(prefs.hideAi) {
+        webSlot.view?.evaluateJavascript(
+            "window.whatswebSetHideAi && window.whatswebSetHideAi(${prefs.hideAi})",
+            null,
+        )
+    }
     LaunchedEffect(state.notice) {
         val message = state.notice ?: return@LaunchedEffect
         state.notice = null
@@ -190,6 +196,7 @@ fun BrowserScreen(
                                         slot = webSlot,
                                         phoneLayout = { prefs.phoneLayout },
                                         quietFrame = { true },
+                                        hideAi = { prefs.hideAi },
                                         textZoom = prefs.textZoom,
                                     ).also { created ->
                                         created.setBackgroundColor(pageColor)

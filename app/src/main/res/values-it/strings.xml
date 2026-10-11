@@ -44,6 +44,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">Layout telefono</string>
     <string name="pref_phone_layout_hint">Mostra l\'elenco delle chat oppure la conversazione.</string>
+    <string name="pref_hide_ai">Nascondi l\'icona IA</string>
+    <string name="pref_hide_ai_hint">Toglie il pulsante Meta AI dallo schermo.</string>
     <string name="pref_dynamic">Colori dello sfondo</string>
     <string name="pref_dynamic_hint">Colora la cornice in base allo sfondo. La conversazione mantiene il tema di WhatsApp.</string>
     <string name="pref_theme">Cornice</string>

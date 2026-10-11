@@ -44,6 +44,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">Telefonlayout</string>
     <string name="pref_phone_layout_hint">Entweder die Chatliste oder das Gespräch anzeigen.</string>
+    <string name="pref_hide_ai">KI-Symbol ausblenden</string>
+    <string name="pref_hide_ai_hint">Entfernt die Meta-AI-Schaltfläche vom Bildschirm.</string>
     <string name="pref_dynamic">Hintergrundfarben</string>
     <string name="pref_dynamic_hint">Färbt den Rahmen nach deinem Hintergrund. Das Gespräch behält das eigene Design von WhatsApp.</string>
     <string name="pref_theme">Rahmen</string>

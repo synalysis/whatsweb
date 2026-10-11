@@ -47,6 +47,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">Phone layout</string>
     <string name="pref_phone_layout_hint">Show either the chat list or the conversation.</string>
+    <string name="pref_hide_ai">Hide AI icon</string>
+    <string name="pref_hide_ai_hint">Take the Meta AI button off the screen.</string>
     <string name="pref_dynamic">Wallpaper colors</string>
     <string name="pref_dynamic_hint">Color the frame from your wallpaper. The conversation keeps WhatsApp\'s own theme.</string>
     <string name="pref_theme">Frame</string>

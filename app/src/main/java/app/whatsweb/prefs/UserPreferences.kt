@@ -29,6 +29,8 @@ class UserPreferences(context: Context) {
         private set
     var phoneLayout by mutableStateOf(prefs.getBoolean(KEY_PHONE, true))
         private set
+    var hideAi by mutableStateOf(prefs.getBoolean(KEY_HIDE_AI, true))
+        private set
     var textZoom by mutableIntStateOf(prefs.getInt(KEY_ZOOM, 100).coerceIn(80, 150))
         private set
     var dynamicColor by mutableStateOf(prefs.getBoolean(KEY_DYNAMIC, true))
@@ -49,6 +51,8 @@ class UserPreferences(context: Context) {
     fun completeWelcome() = write(KEY_WELCOME, true) { welcomeDone = true }
 
     fun updatePhoneLayout(value: Boolean) = write(KEY_PHONE, value) { phoneLayout = value }
+
+    fun updateHideAi(value: Boolean) = write(KEY_HIDE_AI, value) { hideAi = value }
 
     fun updateTextZoom(value: Int) {
         val zoom = value.coerceIn(80, 150)
@@ -94,6 +98,7 @@ class UserPreferences(context: Context) {
     private companion object {
         const val KEY_WELCOME = "welcome"
         const val KEY_PHONE = "phone_layout"
+        const val KEY_HIDE_AI = "hide_ai"
         const val KEY_ZOOM = "text_zoom"
         const val KEY_DYNAMIC = "dynamic_color"
         const val KEY_LOCK = "app_lock"

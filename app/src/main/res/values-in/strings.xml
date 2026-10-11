@@ -44,6 +44,8 @@
     <string name="pref_text_size_value">%1$d%%</string>
     <string name="pref_phone_layout">Tata letak ponsel</string>
     <string name="pref_phone_layout_hint">Tampilkan daftar chat atau percakapan.</string>
+    <string name="pref_hide_ai">Sembunyikan ikon AI</string>
+    <string name="pref_hide_ai_hint">Menghapus tombol Meta AI dari layar.</string>
     <string name="pref_dynamic">Warna wallpaper</string>
     <string name="pref_dynamic_hint">Mewarnai bingkai dari wallpaper Anda. Percakapan tetap memakai tema WhatsApp sendiri.</string>
     <string name="pref_theme">Bingkai</string>

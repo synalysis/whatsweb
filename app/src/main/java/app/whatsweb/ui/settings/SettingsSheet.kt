@@ -79,6 +79,16 @@ fun SettingsSheet(
             },
         )
         ListItem(
+            headlineContent = { Text(stringResource(R.string.pref_hide_ai)) },
+            supportingContent = { Text(stringResource(R.string.pref_hide_ai_hint)) },
+            trailingContent = {
+                Switch(
+                    checked = prefs.hideAi,
+                    onCheckedChange = prefs::updateHideAi,
+                )
+            },
+        )
+        ListItem(
             headlineContent = { Text(stringResource(R.string.pref_theme)) },
             supportingContent = {
                 Row {
