@@ -19,11 +19,11 @@ if (releaseSigningValues.any { !it.isNullOrBlank() } && !releaseSigningConfigure
 }
 
 android {
-    namespace = "app.whatsweb"
+    namespace = "com.synalysis.whatsweb"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.whatsweb"
+        applicationId = "com.synalysis.whatsweb"
         minSdk = 26
         targetSdk = 36
         versionCode = 2
