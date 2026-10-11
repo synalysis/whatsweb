@@ -45,7 +45,11 @@
     "  flex: 0 0 0px !important;",
     "  overflow: hidden !important;",
     "  visibility: hidden !important;",
+    "  pointer-events: none !important;",
     "  padding: 0 !important;",
+    "}",
+    "html[data-whatsweb='phone'] [data-whatsweb-navtip] {",
+    "  display: none !important;",
     "}",
     "html[data-whatsweb='phone'][data-pane='list'] [data-whatsweb-role='list'] {",
     "  flex: 1 1 auto !important;",
@@ -84,7 +88,7 @@
     "}",
     "html[data-whatsweb='phone'] [data-whatsweb-pad] {",
     "  box-sizing: border-box !important;",
-    "  padding-bottom: 64px !important;",
+    "  padding-bottom: 80px !important;",
     "}",
     "#whatsweb-tabbar {",
     "  position: fixed;",
@@ -92,31 +96,73 @@
     "  right: 0;",
     "  bottom: 0;",
     "  z-index: 1000;",
-    "  height: 56px;",
+    "  height: 72px;",
     "  display: flex;",
-    "  align-items: center;",
+    "  align-items: stretch;",
     "  justify-content: space-around;",
     "  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);",
     "}",
     "#whatsweb-tabbar [data-whatsweb-slot] {",
     "  position: relative;",
-    "  width: 40px;",
-    "  height: 40px;",
-    "  flex: 0 0 40px;",
+    "  width: auto;",
+    "  height: auto;",
+    "  flex: 1 1 0;",
+    "  display: flex;",
+    "  flex-direction: column;",
+    "  align-items: center;",
+    "  justify-content: flex-start;",
+    "  padding-top: 8px;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs'])::before {",
+    "  content: '';",
+    "  position: absolute;",
+    "  top: 6px;",
+    "  left: 50%;",
+    "  width: 64px;",
+    "  height: 32px;",
+    "  transform: translateX(-50%);",
+    "  border-radius: 16px;",
+    "  background: transparent;",
+    "  z-index: 0;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot][data-whatsweb-selected='1']:not([data-whatsweb-slot='fabs'])::before {",
+    "  background: #d8fdd2;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-tab-label] {",
+    "  position: relative;",
+    "  z-index: 1;",
+    "  margin-top: -16px;",
+    "  font-size: 12px;",
+    "  line-height: 14px;",
+    "  font-weight: 500;",
+    "  color: rgba(0, 0, 0, 0.6);",
+    "  pointer-events: none;",
+    "}",
+    "@media (prefers-color-scheme: dark) {",
+    "  #whatsweb-tabbar [data-whatsweb-slot][data-whatsweb-selected='1']:not([data-whatsweb-slot='fabs'])::before {",
+    "    background: #0a3329;",
+    "  }",
+    "  #whatsweb-tabbar [data-whatsweb-tab-label] {",
+    "    color: rgba(255, 255, 255, 0.6);",
+    "  }",
     "}",
     "#whatsweb-tabbar [data-whatsweb-slot='fabs'] {",
     "  position: absolute;",
     "  left: 83.333%;",
-    "  bottom: 72px;",
+    "  bottom: calc(100% + 16px);",
     "  width: 40px;",
     "  height: auto;",
     "  flex: none;",
+    "  padding-top: 0;",
     "  transform: translateX(-50%);",
     "  display: flex;",
     "  flex-direction: column;",
     "  align-items: center;",
     "  gap: 16px;",
     "  z-index: 2;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot='fabs']::before {",
+    "  content: none;",
     "}",
     "#whatsweb-tabbar button {",
     "  position: relative !important;",
@@ -126,6 +172,20 @@
     "  bottom: auto !important;",
     "  margin: 0 !important;",
     "  transform: none !important;",
+    "  z-index: 1;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs']) button {",
+    "  width: 88px !important;",
+    "  height: 56px !important;",
+    "  display: flex !important;",
+    "  align-items: flex-start !important;",
+    "  justify-content: center !important;",
+    "  padding-top: 2px !important;",
+    "  background: transparent !important;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs']) button::after {",
+    "  content: none !important;",
+    "  display: none !important;",
     "}",
     "[data-whatsweb-quiet-room] {",
     "  box-sizing: border-box !important;",
@@ -147,9 +207,9 @@
     "}",
     "#whatsweb-tabbar [data-whatsweb-badge] {",
     "  position: absolute !important;",
-    "  top: -6px !important;",
-    "  right: -6px !important;",
-    "  left: auto !important;",
+    "  top: 4px !important;",
+    "  left: calc(50% + 8px) !important;",
+    "  right: auto !important;",
     "  bottom: auto !important;",
     "  z-index: 2 !important;",
     "  margin: 0 !important;",
@@ -690,6 +750,22 @@
     document.documentElement.dataset.whatswebDrawer = "1";
   }
 
+  function labelTab(bar, name, text) {
+    var slot = bar.querySelector("[data-whatsweb-slot='" + name + "']");
+    if (!slot) return;
+    var label = slot.querySelector("[data-whatsweb-tab-label]");
+    if (!label) {
+      label = document.createElement("span");
+      label.dataset.whatswebTabLabel = "1";
+      slot.appendChild(label);
+    }
+    if (label.textContent !== text) label.textContent = text;
+    var button = slot.querySelector("button, [role='button']");
+    var selected = button && button.getAttribute("data-navbar-item-selected") === "true";
+    if (selected) slot.dataset.whatswebSelected = "1";
+    else delete slot.dataset.whatswebSelected;
+  }
+
   function placeBottomNav() {
     var header = navRail();
     if (!header) return false;
@@ -707,6 +783,9 @@
     park(chats, bar.querySelector("[data-whatsweb-slot='chats']"));
     park(status, bar.querySelector("[data-whatsweb-slot='status']"));
     park(calls, bar.querySelector("[data-whatsweb-slot='calls']"));
+    labelTab(bar, "chats", "Chats");
+    labelTab(bar, "status", "Updates");
+    labelTab(bar, "calls", "Calls");
     var chatsSlot = bar.querySelector("[data-whatsweb-slot='chats']");
     if (badge && chatsSlot) {
       rememberHome(badge);
@@ -731,17 +810,54 @@
     return true;
   }
 
+  function scheduleApply() {
+    if (window.__whatswebNavTick) return;
+    window.__whatswebNavTick = true;
+    window.requestAnimationFrame(function () {
+      window.__whatswebNavTick = false;
+      apply();
+    });
+  }
+
+  // A tab's header shows up over the next few frames. Keep correcting until
+  // that animation has finished, instead of waiting for the slow poll.
+  function followPage() {
+    window.__whatswebFollowUntil = performance.now() + 320;
+    if (window.__whatswebFollow) return;
+    window.__whatswebFollow = true;
+    function tick() {
+      apply();
+      if (performance.now() < window.__whatswebFollowUntil) window.requestAnimationFrame(tick);
+      else window.__whatswebFollow = false;
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  function touchesHeader(node) {
+    if (!node || node.nodeType !== 1) return false;
+    if (node.tagName === "HEADER" || node.getAttribute("role") === "banner") return true;
+    if (node.closest && (node.closest("header") || node.closest("[role='banner']"))) return true;
+    if (node.querySelector && node.querySelector("header, [role='banner']")) return true;
+    return false;
+  }
+
+  function headerMutation(mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      if (touchesHeader(mutations[i].target)) return true;
+      var added = mutations[i].addedNodes;
+      for (var a = 0; a < added.length; a++) {
+        if (touchesHeader(added[a])) return true;
+      }
+    }
+    return false;
+  }
+
   function watchNav(header) {
     var observer = window.__whatswebNavObserver;
     if (!observer) {
       observer = new MutationObserver(function () {
         if (!window.__whatswebPhone) return;
-        if (window.__whatswebNavTick) return;
-        window.__whatswebNavTick = true;
-        window.requestAnimationFrame(function () {
-          window.__whatswebNavTick = false;
-          apply();
-        });
+        scheduleApply();
       });
       window.__whatswebNavObserver = observer;
     }
@@ -752,6 +868,22 @@
     if (plusHome && plusHome !== header && header && !header.contains(plusHome)) {
       observer.observe(plusHome, { childList: true });
     }
+  }
+
+  function watchPage() {
+    var observer = window.__whatswebPageObserver;
+    if (!observer) {
+      observer = new MutationObserver(function (mutations) {
+        if (!window.__whatswebPhone || !headerMutation(mutations)) return;
+        scheduleApply();
+      });
+      window.__whatswebPageObserver = observer;
+    }
+    var pane = document.getElementById("pane-side") || document.querySelector("[data-whatsweb-role='list']");
+    if (!pane || pane === window.__whatswebPageNode) return;
+    observer.disconnect();
+    window.__whatswebPageNode = pane;
+    observer.observe(pane, { childList: true, subtree: true });
   }
 
   var reportedPane = "";
@@ -898,6 +1030,189 @@
     if (menu) menu.dataset.whatswebChatMenu = "1";
   }
 
+  function iconName(button) {
+    if (!button) return "";
+    var icon = button.querySelector("[data-icon]");
+    if (icon && icon.getAttribute("data-icon")) return icon.getAttribute("data-icon").toLowerCase();
+    var title = button.querySelector("svg title");
+    return title && title.textContent ? title.textContent.trim().toLowerCase() : "";
+  }
+
+  function readTranslateX(el) {
+    var match = /translateX\((-?[0-9.]+)px\)/.exec(el.style.transform || "");
+    return match ? parseFloat(match[1]) : 0;
+  }
+
+  function setShift(el, px) {
+    // WhatsApp animates transform. Cancel that so a correction does not lag
+    // a frame behind the page change or fight the next correction.
+    el.style.transition = "none";
+    el.style.transform = "translateX(" + px + "px)";
+  }
+
+  function clearShift(el) {
+    el.style.transition = "";
+    el.style.transform = "";
+  }
+
+  function clearStatusHeader() {
+    var groups = document.querySelectorAll("[data-whatsweb-status-actions]");
+    for (var i = 0; i < groups.length; i++) {
+      clearShift(groups[i]);
+      delete groups[i].dataset.whatswebStatusActions;
+    }
+    var pluses = document.querySelectorAll("[data-whatsweb-status-plus]");
+    for (var j = 0; j < pluses.length; j++) {
+      pluses[j].style.order = "";
+      delete pluses[j].dataset.whatswebStatusPlus;
+    }
+  }
+
+  function findHeaderButton(name) {
+    var buttons = document.querySelectorAll("button, [role='button']");
+    for (var i = 0; i < buttons.length; i++) {
+      var button = buttons[i];
+      if (iconName(button) !== name) continue;
+      if (button.closest && button.closest("#whatsweb-tabbar")) continue;
+      var rect = button.getBoundingClientRect();
+      if (rect.width < 8 || rect.top > 80 || rect.bottom < 0) continue;
+      return button;
+    }
+    return null;
+  }
+
+  // Status draws Add to the right of its own menu, so Add sits under the app
+  // settings gear. The flex child is reordered, then the row is shifted until
+  // that menu lines up with the chats menu, which already clears the gear.
+  function placeStatusHeader() {
+    var plus = findHeaderButton("ic-add-circle");
+    var found = null;
+    var el = plus && plus.parentElement;
+    while (plus && el && el !== document.body) {
+      var display = window.getComputedStyle(el).display;
+      if ((display === "flex" || display === "inline-flex") && el.children.length >= 2) {
+        var menu = null;
+        for (var c = 0; c < el.children.length; c++) {
+          var button = el.children[c].querySelector("button, [role='button']");
+          if (button && iconName(button) === "ic-more-vert") menu = button;
+        }
+        if (menu && el.contains(plus)) {
+          var plusItem = plus;
+          while (plusItem.parentElement && plusItem.parentElement !== el) plusItem = plusItem.parentElement;
+          found = { group: el, menu: menu, plusItem: plusItem };
+          break;
+        }
+      }
+      el = el.parentElement;
+    }
+    if (!found) {
+      clearStatusHeader();
+      return;
+    }
+    var markedGroups = document.querySelectorAll("[data-whatsweb-status-actions]");
+    for (var g = 0; g < markedGroups.length; g++) {
+      if (markedGroups[g] === found.group) continue;
+      clearShift(markedGroups[g]);
+      delete markedGroups[g].dataset.whatswebStatusActions;
+    }
+    var markedPlus = document.querySelectorAll("[data-whatsweb-status-plus]");
+    for (var p = 0; p < markedPlus.length; p++) {
+      if (markedPlus[p] === found.plusItem) continue;
+      markedPlus[p].style.order = "";
+      delete markedPlus[p].dataset.whatswebStatusPlus;
+    }
+    found.plusItem.dataset.whatswebStatusPlus = "1";
+    found.plusItem.style.order = "-1";
+    found.group.dataset.whatswebStatusActions = "1";
+    var target = null;
+    var menus = document.querySelectorAll("button, [role='button']");
+    for (var m = 0; m < menus.length; m++) {
+      var candidate = menus[m];
+      if (iconName(candidate) !== "ic-more-vert" || found.group.contains(candidate)) continue;
+      if (candidate.closest && candidate.closest("#whatsweb-tabbar")) continue;
+      var rect = candidate.getBoundingClientRect();
+      if (rect.width < 8 || rect.top > 80 || rect.bottom < 0) continue;
+      if (target === null || rect.right > target) target = rect.right;
+    }
+    if (target === null) target = window.innerWidth - 40;
+    var shift = target - found.menu.getBoundingClientRect().right;
+    if (Math.abs(shift) < 0.5) return;
+    setShift(found.group, readTranslateX(found.group) + shift);
+  }
+
+  function headerMenuRight(except) {
+    var target = null;
+    var menus = document.querySelectorAll("button, [role='button']");
+    for (var m = 0; m < menus.length; m++) {
+      var candidate = menus[m];
+      if (candidate === except || iconName(candidate) !== "ic-more-vert") continue;
+      if (candidate.closest && candidate.closest("#whatsweb-tabbar")) continue;
+      var rect = candidate.getBoundingClientRect();
+      if (rect.width < 8 || rect.top > 80 || rect.bottom < 0) continue;
+      if (target === null || rect.right > target) target = rect.right;
+    }
+    if (target === null) target = window.innerWidth - 40;
+    return target;
+  }
+
+  // New call and the new-chat keypad sit flush with the header edge, under the
+  // app settings gear. Shift each until its right edge matches the chats menu.
+  function placeEdgeHeaders() {
+    var icons = ["ic-add-call", "ic-dialpad"];
+    var keep = [];
+    for (var i = 0; i < icons.length; i++) {
+      var button = findHeaderButton(icons[i]);
+      if (!button) continue;
+      keep.push(button);
+      button.dataset.whatswebEdgeShift = "1";
+      var shift = headerMenuRight(button) - button.getBoundingClientRect().right;
+      if (Math.abs(shift) < 0.5) continue;
+      setShift(button, readTranslateX(button) + shift);
+    }
+    var marked = document.querySelectorAll("[data-whatsweb-edge-shift]");
+    for (var m = 0; m < marked.length; m++) {
+      if (keep.indexOf(marked[m]) !== -1) continue;
+      clearShift(marked[m]);
+      delete marked[m].dataset.whatswebEdgeShift;
+    }
+  }
+
+  function releaseHover(el) {
+    if (!el || !el.dispatchEvent) return;
+    ["pointerout", "pointerleave", "mouseout", "mouseleave"].forEach(function (type) {
+      el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
+    });
+    if (el.blur) el.blur();
+  }
+
+  // Moving a nav button into the bottom bar leaves its tooltip anchor in the old
+  // rail. A tap opens that tip and the matching leave never arrives, so it stays
+  // up over the page. Close the hover and keep the tip hidden.
+  function hideNavTips() {
+    var bar = document.getElementById("whatsweb-tabbar");
+    var labels = {};
+    if (bar) {
+      var parked = bar.querySelectorAll("button, [role='button']");
+      for (var p = 0; p < parked.length; p++) {
+        var label = (parked[p].getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+        if (label) labels[label] = parked[p];
+      }
+    }
+    var tips = document.querySelectorAll("[role='tooltip']");
+    for (var t = 0; t < tips.length; t++) {
+      var text = (tips[t].textContent || "").replace(/\s+/g, " ").trim();
+      var button = labels[text];
+      if (!button) continue;
+      tips[t].dataset.whatswebNavtip = "1";
+      if (tips[t].__whatswebTipClosed) continue;
+      tips[t].__whatswebTipClosed = true;
+      var home = button.__whatswebParent;
+      var described = home && home.closest("[aria-describedby]");
+      releaseHover(described || home);
+      releaseHover(button);
+    }
+  }
+
   function placeQuietRoom() {
     var marked = document.querySelectorAll("[data-whatsweb-quiet-room]");
     for (var i = 0; i < marked.length; i++) delete marked[i].dataset.whatswebQuietRoom;
@@ -923,6 +1238,9 @@
   function apply() {
     hideDownloadBanner();
     placeQuietRoom();
+    placeStatusHeader();
+    placeEdgeHeaders();
+    hideNavTips();
     placeBackRoom();
     var found = companionPanes();
     if (!found) {
@@ -949,8 +1267,10 @@
       layoutPanes();
     }
     reportSession();
-    if (window.__whatswebPhone) fitOverlay();
-    else clearOverlay();
+    if (window.__whatswebPhone) {
+      fitOverlay();
+      watchPage();
+    } else clearOverlay();
   }
 
   function revealChat() {
@@ -967,6 +1287,17 @@
     window.dispatchEvent(new Event("resize"));
     reportPane();
   }
+
+  document.addEventListener("pointerup", function (event) {
+    if (!window.__whatswebPhone) return;
+    var target = event.target;
+    var button = target && target.closest && target.closest("#whatsweb-tabbar button, #whatsweb-tabbar [role='button']");
+    if (button) {
+      releaseHover(button);
+      followPage();
+    }
+    window.setTimeout(hideNavTips, 0);
+  }, true);
 
   document.addEventListener("pointerdown", function (event) {
     if (!window.__whatswebPhone) return;
