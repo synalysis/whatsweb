@@ -6,7 +6,7 @@ These steps are for cutting a release. They are not part of using the app.
 
 The release APK is unsigned unless `WHATSWEB_KEYSTORE`, `WHATSWEB_KEYSTORE_PASSWORD`, `WHATSWEB_KEY_ALIAS`, and `WHATSWEB_KEY_PASSWORD` are all set. A partial set fails the build instead of producing a mis-signed APK. The unsigned file is `app-release-unsigned.apk`. F-Droid signs its own build from that output.
 
-Pushing a tag such as `v1.0.1` runs [`.github/workflows/release.yml`](.github/workflows/release.yml). The tag has to match `versionName` in `app/build.gradle.kts`. Before the tag, raise `versionCode` so Android accepts the update. The workflow needs these repository secrets, taken from one keystore that is kept and reused:
+Run `scripts/tag-release` after the version in `app/build.gradle.kts` is committed. It tags the current commit `v` plus `versionName`, which is the only form [`.github/workflows/release.yml`](.github/workflows/release.yml) accepts. Before that, raise `versionCode` so Android accepts the update. Pushing the tag starts the workflow. The workflow needs these repository secrets, taken from one keystore that is kept and reused:
 
 - `WHATSWEB_KEYSTORE_BASE64` — `base64 -w 0 release.jks`
 - `WHATSWEB_KEYSTORE_PASSWORD`
