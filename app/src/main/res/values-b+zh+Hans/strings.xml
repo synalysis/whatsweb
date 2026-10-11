@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">更安静的伙伴</string>
+    <string name="welcome_body">通过 WhatsApp 网页版阅读和回复，布局是为手机设计的，而不是桌面窗口。</string>
+    <string name="welcome_point_link_title">关联新设备</string>
+    <string name="welcome_point_link_body">在你已经在用的 WhatsApp 应用里，打开“已关联的设备”并扫描二维码。这和桌面浏览器建立的关联是同一种。</string>
+    <string name="welcome_point_layout_title">单栏</string>
+    <string name="welcome_point_layout_body">聊天列表和打开的对话轮流占满屏幕。在平板上可以关掉这个选项，同时保留两者。</string>
+    <string name="welcome_point_privacy_title">不会额外添加任何东西</string>
+    <string name="welcome_point_privacy_body">没有 WhatsWeb 账号，也没有分析。消息仍通过 WhatsApp 发送，而 WhatsApp 是专有服务。</string>
+    <string name="welcome_continue">打开伙伴</string>
+    <string name="welcome_disclaimer">WhatsWeb 是自由软件。它不是 WhatsApp，也与 WhatsApp LLC 无关。</string>
+
+    <string name="title_link">关联新设备</string>
+    <string name="title_chats">聊天</string>
+    <string name="tab_chats">聊天</string>
+    <string name="tab_updates">动态</string>
+    <string name="tab_calls">通话</string>
+    <string name="title_conversation">对话</string>
+    <string name="link_hint">在手机上打开 WhatsApp，然后依次点“已关联的设备”和“关联新设备”，把摄像头对准这个二维码。</string>
+    <string name="link_hint_dismiss">隐藏</string>
+
+    <string name="cd_settings">设置</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_reload">重新加载</string>
+
+    <string name="exit_again">再按一次返回即可退出</string>
+    <string name="error_offline">现在无法连接到伙伴。</string>
+    <string name="error_retry">重试</string>
+    <string name="error_webview_missing">这台手机没有 WebView，因此无法显示伙伴。</string>
+    <string name="error_page_stopped">伙伴已停止。请重试。</string>
+    <string name="error_recovered">WhatsApp 把这台手机送回了它的网站。正在重新打开伙伴。</string>
+
+    <string name="share_ready">分享的文字可以粘贴到聊天里。</string>
+    <string name="share_copy">复制</string>
+    <string name="share_dismiss">关闭</string>
+    <string name="share_copied">已复制</string>
+    <string name="share_saved">分享的文件已保存到下载。请从聊天中添加附件。</string>
+    <string name="share_saved_private">分享的文件已保存到 WhatsWeb 的文件夹。</string>
+    <string name="share_failed">无法保留这个分享的文件。</string>
+
+    <string name="settings_title">设置</string>
+    <string name="pref_text_size">文字大小</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">手机布局</string>
+    <string name="pref_phone_layout_hint">只显示聊天列表或对话其中之一。</string>
+    <string name="pref_dynamic">壁纸颜色</string>
+    <string name="pref_dynamic_hint">用壁纸给外框上色。对话仍使用 WhatsApp 自己的主题。</string>
+    <string name="pref_theme">外框</string>
+    <string name="theme_system">系统</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="pref_lock">应用锁</string>
+    <string name="pref_lock_hint">当 WhatsWeb 回到前台时，要求使用这台设备的锁屏。</string>
+    <string name="pref_secure">在最近任务中隐藏</string>
+    <string name="pref_secure_hint">清空最近任务的预览，并禁止截屏。</string>
+    <string name="pref_links">在这里打开 WhatsApp 链接</string>
+    <string name="pref_links_hint">用 WhatsWeb 处理 wa.me 和聊天链接。</string>
+    <string name="session_clear">清除此关联</string>
+    <string name="session_clear_title">清除此关联？</string>
+    <string name="session_clear_body">这会在这台手机上退出伙伴。之后可以用新的二维码再次关联。</string>
+    <string name="session_clear_confirm">清除</string>
+    <string name="cancel">取消</string>
+    <string name="about_heading">关于</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_license">以 GPL-3.0-or-later 授权。</string>
+    <string name="about_disclaimer">独立于 WhatsApp。页面本身是官方的 WhatsApp 网页版。</string>
+    <string name="about_notifications">没有后台提醒。此应用不运行 WhatsApp 的推送服务。</string>
+
+    <string name="lock_title">解锁 WhatsWeb</string>
+    <string name="lock_subtitle">确认是你本人后才会显示伙伴。</string>
+    <string name="lock_button">解锁</string>
+    <string name="lock_unavailable">这台设备无法确认锁屏，因此已关闭应用锁。</string>
+    <string name="cd_unlock">解锁</string>
+
+    <string name="download_started">已开始下载</string>
+    <string name="download_saved">已保存到下载</string>
+    <string name="download_saved_private">已保存到 WhatsWeb 的文件夹</string>
+    <string name="download_failed">无法保存该文件</string>
+    <string name="download_too_large">该文件太大，无法从页面保存</string>
+    <string name="no_browser">没有可用于该链接的浏览器</string>
+</resources>

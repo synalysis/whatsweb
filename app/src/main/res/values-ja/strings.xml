@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">より静かな相棒</string>
+    <string name="welcome_body">WhatsApp Web で読み書きします。デスクトップのウィンドウではなく、電話向けのレイアウトです。</string>
+    <string name="welcome_point_link_title">デバイスをリンク</string>
+    <string name="welcome_point_link_body">すでに使っている WhatsApp アプリで「リンク済みデバイス」を開き、コードをスキャンします。デスクトップのブラウザと同じリンクです。</string>
+    <string name="welcome_point_layout_title">1列</string>
+    <string name="welcome_point_layout_body">チャット一覧と開いている会話が、交互に画面いっぱいに表示されます。タブレットではこれをオフにして、両方を表示できます。</string>
+    <string name="welcome_point_privacy_title">余計なものは加えません</string>
+    <string name="welcome_point_privacy_body">WhatsWeb のアカウントも解析もありません。メッセージはこれまでどおり WhatsApp を通ります。WhatsApp はプロプライエタリなサービスです。</string>
+    <string name="welcome_continue">相棒を開く</string>
+    <string name="welcome_disclaimer">WhatsWeb はフリーソフトウェアです。WhatsApp ではなく、WhatsApp LLC とも関係ありません。</string>
+
+    <string name="title_link">デバイスをリンク</string>
+    <string name="title_chats">チャット</string>
+    <string name="tab_chats">チャット</string>
+    <string name="tab_updates">アップデート</string>
+    <string name="tab_calls">通話</string>
+    <string name="title_conversation">会話</string>
+    <string name="link_hint">電話で WhatsApp を開き、「リンク済みデバイス」、「デバイスをリンク」の順に進み、カメラをこのコードに向けてください。</string>
+    <string name="link_hint_dismiss">非表示</string>
+
+    <string name="cd_settings">設定</string>
+    <string name="cd_back">戻る</string>
+    <string name="cd_reload">再読み込み</string>
+
+    <string name="exit_again">終了するには、もう一度戻るを押してください</string>
+    <string name="error_offline">今は相棒に接続できません。</string>
+    <string name="error_retry">もう一度試す</string>
+    <string name="error_webview_missing">この電話には WebView がないため、相棒を表示できません。</string>
+    <string name="error_page_stopped">相棒が停止しました。もう一度試してください。</string>
+    <string name="error_recovered">WhatsApp がこの電話を自社サイトへ戻しました。相棒を開き直します。</string>
+
+    <string name="share_ready">共有したテキストをチャットに貼り付けできます。</string>
+    <string name="share_copy">コピー</string>
+    <string name="share_dismiss">閉じる</string>
+    <string name="share_copied">コピーしました</string>
+    <string name="share_saved">共有ファイルをダウンロードに保存しました。チャットから添付してください。</string>
+    <string name="share_saved_private">共有ファイルを WhatsWeb のフォルダに保存しました。</string>
+    <string name="share_failed">その共有ファイルを保存できませんでした。</string>
+
+    <string name="settings_title">設定</string>
+    <string name="pref_text_size">文字サイズ</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">電話レイアウト</string>
+    <string name="pref_phone_layout_hint">チャット一覧か会話のどちらかを表示します。</string>
+    <string name="pref_dynamic">壁紙の色</string>
+    <string name="pref_dynamic_hint">枠の色を壁紙から取ります。会話は WhatsApp 自身のテーマのままです。</string>
+    <string name="pref_theme">枠</string>
+    <string name="theme_system">システム</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="pref_lock">アプリロック</string>
+    <string name="pref_lock_hint">WhatsWeb が前面に戻ったとき、この端末のロックを求めます。</string>
+    <string name="pref_secure">最近使ったアプリで隠す</string>
+    <string name="pref_secure_hint">最近使ったアプリのプレビューを空にし、スクリーンショットを禁止します。</string>
+    <string name="pref_links">WhatsApp のリンクをここで開く</string>
+    <string name="pref_links_hint">wa.me とチャットのリンクを WhatsWeb で開きます。</string>
+    <string name="session_clear">このリンクを消去</string>
+    <string name="session_clear_title">このリンクを消去しますか？</string>
+    <string name="session_clear_body">この電話の相棒をログアウトします。新しいコードでもう一度リンクできます。</string>
+    <string name="session_clear_confirm">消去</string>
+    <string name="cancel">キャンセル</string>
+    <string name="about_heading">このアプリについて</string>
+    <string name="about_version">バージョン %1$s</string>
+    <string name="about_license">GPL-3.0-or-later でライセンスされています。</string>
+    <string name="about_disclaimer">WhatsApp とは独立しています。ページそのものは公式の WhatsApp Web です。</string>
+    <string name="about_notifications">バックグラウンド通知はありません。このアプリは WhatsApp のプッシュサービスを実行しません。</string>
+
+    <string name="lock_title">WhatsWeb のロックを解除</string>
+    <string name="lock_subtitle">本人確認後に相棒を表示します。</string>
+    <string name="lock_button">ロック解除</string>
+    <string name="lock_unavailable">この端末ではロックを確認できないため、アプリロックをオフにしました。</string>
+    <string name="cd_unlock">ロック解除</string>
+
+    <string name="download_started">ダウンロードを開始しました</string>
+    <string name="download_saved">ダウンロードに保存しました</string>
+    <string name="download_saved_private">WhatsWeb のフォルダに保存しました</string>
+    <string name="download_failed">そのファイルを保存できませんでした</string>
+    <string name="download_too_large">そのファイルは大きすぎて、ページから保存できません</string>
+    <string name="no_browser">そのリンクを開くブラウザがありません</string>
+</resources>

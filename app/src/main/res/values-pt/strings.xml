@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Um companheiro mais discreto</string>
+    <string name="welcome_body">Lê e responde pelo WhatsApp Web, num esquema feito para o telemóvel e não para uma janela de secretária.</string>
+    <string name="welcome_point_link_title">Associar um dispositivo</string>
+    <string name="welcome_point_link_body">Na aplicação WhatsApp que já usas, abre Dispositivos associados e lê o código. É a mesma associação que um navegador de secretária faria.</string>
+    <string name="welcome_point_layout_title">Uma coluna</string>
+    <string name="welcome_point_layout_body">A lista de conversas e a conversa aberta ocupam o ecrã à vez. Num tablet podes desligar isso e manter as duas.</string>
+    <string name="welcome_point_privacy_title">Nada mais é acrescentado</string>
+    <string name="welcome_point_privacy_body">Não há conta WhatsWeb nem análises. As mensagens continuam a passar pelo WhatsApp, que é um serviço proprietário.</string>
+    <string name="welcome_continue">Abrir o companheiro</string>
+    <string name="welcome_disclaimer">O WhatsWeb é software livre. Não é o WhatsApp e não está afiliado à WhatsApp LLC.</string>
+
+    <string name="title_link">Associar um dispositivo</string>
+    <string name="title_chats">Conversas</string>
+    <string name="tab_chats">Conversas</string>
+    <string name="tab_updates">Atualizações</string>
+    <string name="tab_calls">Chamadas</string>
+    <string name="title_conversation">Conversa</string>
+    <string name="link_hint">No telemóvel, abre o WhatsApp, depois Dispositivos associados, depois Associar um dispositivo, e aponta a câmara para este código.</string>
+    <string name="link_hint_dismiss">Ocultar</string>
+
+    <string name="cd_settings">Definições</string>
+    <string name="cd_back">Voltar</string>
+    <string name="cd_reload">Recarregar</string>
+
+    <string name="exit_again">Prime novamente em voltar para sair</string>
+    <string name="error_offline">Não é possível contactar o companheiro neste momento.</string>
+    <string name="error_retry">Tentar novamente</string>
+    <string name="error_webview_missing">Este telemóvel não tem WebView, por isso o companheiro não pode ser mostrado.</string>
+    <string name="error_page_stopped">O companheiro parou. Tenta novamente.</string>
+    <string name="error_recovered">O WhatsApp devolveu este telemóvel ao site. A abrir o companheiro outra vez.</string>
+
+    <string name="share_ready">O texto partilhado está pronto a colar numa conversa.</string>
+    <string name="share_copy">Copiar</string>
+    <string name="share_dismiss">Fechar</string>
+    <string name="share_copied">Copiado</string>
+    <string name="share_saved">O ficheiro partilhado foi guardado em Transferências. Anexa-o a partir da conversa.</string>
+    <string name="share_saved_private">O ficheiro partilhado foi guardado na pasta do WhatsWeb.</string>
+    <string name="share_failed">Não foi possível guardar esse ficheiro partilhado.</string>
+
+    <string name="settings_title">Definições</string>
+    <string name="pref_text_size">Tamanho do texto</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Esquema de telemóvel</string>
+    <string name="pref_phone_layout_hint">Mostrar a lista de conversas ou a conversa.</string>
+    <string name="pref_dynamic">Cores do fundo</string>
+    <string name="pref_dynamic_hint">Colore a moldura a partir do teu fundo. A conversa mantém o tema do WhatsApp.</string>
+    <string name="pref_theme">Moldura</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="pref_lock">Bloqueio da app</string>
+    <string name="pref_lock_hint">Pede o bloqueio deste dispositivo quando o WhatsWeb volta para primeiro plano.</string>
+    <string name="pref_secure">Ocultar nos recentes</string>
+    <string name="pref_secure_hint">Esvazia a pré-visualização das apps recentes e bloqueia as capturas de ecrã.</string>
+    <string name="pref_links">Abrir ligações do WhatsApp aqui</string>
+    <string name="pref_links_hint">Trata ligações wa.me e de conversa no WhatsWeb.</string>
+    <string name="session_clear">Limpar esta associação</string>
+    <string name="session_clear_title">Limpar esta associação?</string>
+    <string name="session_clear_body">Isto termina a sessão do companheiro neste telemóvel. Podes associá-lo de novo com um código novo.</string>
+    <string name="session_clear_confirm">Limpar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="about_heading">Acerca de</string>
+    <string name="about_version">Versão %1$s</string>
+    <string name="about_license">Licenciado ao abrigo da GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Independente do WhatsApp. A página em si é o companheiro oficial do WhatsApp Web.</string>
+    <string name="about_notifications">Os alertas em segundo plano não estão disponíveis. Esta app não executa o serviço de notificações do WhatsApp.</string>
+
+    <string name="lock_title">Desbloquear o WhatsWeb</string>
+    <string name="lock_subtitle">Confirma que és tu para mostrar o companheiro.</string>
+    <string name="lock_button">Desbloquear</string>
+    <string name="lock_unavailable">Este dispositivo não consegue confirmar um bloqueio, por isso o bloqueio da app foi desligado.</string>
+    <string name="cd_unlock">Desbloquear</string>
+
+    <string name="download_started">Transferência iniciada</string>
+    <string name="download_saved">Guardado em Transferências</string>
+    <string name="download_saved_private">Guardado na pasta do WhatsWeb</string>
+    <string name="download_failed">Não foi possível guardar esse ficheiro</string>
+    <string name="download_too_large">Esse ficheiro é demasiado grande para ser guardado a partir da página</string>
+    <string name="no_browser">Não há nenhum navegador disponível para essa ligação</string>
+</resources>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">WhatsWeb</string>
+    <string name="app_name" translatable="false">WhatsWeb</string>
 
-    <string name="welcome_kicker">WhatsWeb</string>
+    <string name="welcome_kicker" translatable="false">WhatsWeb</string>
     <string name="welcome_title">A quieter companion</string>
     <string name="welcome_body">Read and reply through WhatsApp Web, in a layout made for a phone rather than a desktop window.</string>
     <string name="welcome_point_link_title">Link a device</string>
@@ -16,6 +16,9 @@
 
     <string name="title_link">Link a device</string>
     <string name="title_chats">Chats</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_updates">Updates</string>
+    <string name="tab_calls">Calls</string>
     <string name="title_conversation">Conversation</string>
     <string name="link_hint">On your phone, open WhatsApp, then Linked devices, then Link a device, and point the camera at this code.</string>
     <string name="link_hint_dismiss">Hide</string>

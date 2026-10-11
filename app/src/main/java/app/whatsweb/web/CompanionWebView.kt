@@ -19,6 +19,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.JavaScriptReplyProxy
+import org.json.JSONObject
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import app.whatsweb.ui.AppState
@@ -210,7 +211,7 @@ fun createCompanionWebView(
             override fun onPageFinished(view: WebView, url: String?) {
                 if (!LinkRouter.isCompanionPage(url)) return
                 view.evaluateJavascript(
-                    "window.__whatswebPhone = ${phoneLayout()};\nwindow.__whatswebQuiet = ${quietFrame()};\n$layout",
+                    "window.__whatswebPhone = ${phoneLayout()};\nwindow.__whatswebQuiet = ${quietFrame()};\n${tabLabelScript(view.context)}\n$layout",
                     null,
                 )
             }
@@ -299,6 +300,13 @@ private fun blockedTelemetry(request: WebResourceRequest): WebResourceResponse? 
         ),
         ByteArrayInputStream(ByteArray(0)),
     )
+}
+
+private fun tabLabelScript(context: Context): String {
+    fun quoted(id: Int) = JSONObject.quote(context.getString(id))
+    return "window.__whatswebTabChats=${quoted(app.whatsweb.R.string.tab_chats)};" +
+        "window.__whatswebTabUpdates=${quoted(app.whatsweb.R.string.tab_updates)};" +
+        "window.__whatswebTabCalls=${quoted(app.whatsweb.R.string.tab_calls)};"
 }
 
 private fun dispatchNavigation(view: WebView, url: String, host: WebHost): Boolean {

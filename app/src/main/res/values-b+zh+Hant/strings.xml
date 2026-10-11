@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">更安靜的夥伴</string>
+    <string name="welcome_body">透過 WhatsApp 網頁版閱讀和回覆，版面是為手機設計的，而不是桌面視窗。</string>
+    <string name="welcome_point_link_title">連結裝置</string>
+    <string name="welcome_point_link_body">在你已經在用的 WhatsApp 應用程式裡，開啟「已連結的裝置」並掃描條碼。這和桌面瀏覽器建立的連結是同一種。</string>
+    <string name="welcome_point_layout_title">單欄</string>
+    <string name="welcome_point_layout_body">聊天列表和打開的對話輪流佔滿螢幕。在平板上可以關掉這個選項，同時保留兩者。</string>
+    <string name="welcome_point_privacy_title">不會額外加入任何東西</string>
+    <string name="welcome_point_privacy_body">沒有 WhatsWeb 帳號，也沒有分析。訊息仍透過 WhatsApp 傳送，而 WhatsApp 是專有服務。</string>
+    <string name="welcome_continue">開啟夥伴</string>
+    <string name="welcome_disclaimer">WhatsWeb 是自由軟體。它不是 WhatsApp，也與 WhatsApp LLC 無關。</string>
+
+    <string name="title_link">連結裝置</string>
+    <string name="title_chats">聊天</string>
+    <string name="tab_chats">聊天</string>
+    <string name="tab_updates">動態</string>
+    <string name="tab_calls">通話</string>
+    <string name="title_conversation">對話</string>
+    <string name="link_hint">在手機上開啟 WhatsApp，然後依序點「已連結的裝置」和「連結裝置」，把相機對準這個條碼。</string>
+    <string name="link_hint_dismiss">隱藏</string>
+
+    <string name="cd_settings">設定</string>
+    <string name="cd_back">返回</string>
+    <string name="cd_reload">重新載入</string>
+
+    <string name="exit_again">再按一次返回即可離開</string>
+    <string name="error_offline">現在無法連線到夥伴。</string>
+    <string name="error_retry">重試</string>
+    <string name="error_webview_missing">這支手機沒有 WebView，因此無法顯示夥伴。</string>
+    <string name="error_page_stopped">夥伴已停止。請重試。</string>
+    <string name="error_recovered">WhatsApp 把這支手機送回了它的網站。正在重新開啟夥伴。</string>
+
+    <string name="share_ready">分享的文字可以貼到聊天裡。</string>
+    <string name="share_copy">複製</string>
+    <string name="share_dismiss">關閉</string>
+    <string name="share_copied">已複製</string>
+    <string name="share_saved">分享的檔案已儲存到下載。請從聊天中加入附件。</string>
+    <string name="share_saved_private">分享的檔案已儲存到 WhatsWeb 的資料夾。</string>
+    <string name="share_failed">無法保留這個分享的檔案。</string>
+
+    <string name="settings_title">設定</string>
+    <string name="pref_text_size">文字大小</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">手機版面</string>
+    <string name="pref_phone_layout_hint">只顯示聊天列表或對話其中之一。</string>
+    <string name="pref_dynamic">桌布顏色</string>
+    <string name="pref_dynamic_hint">用桌布為外框上色。對話仍使用 WhatsApp 自己的主題。</string>
+    <string name="pref_theme">外框</string>
+    <string name="theme_system">系統</string>
+    <string name="theme_light">淺色</string>
+    <string name="theme_dark">深色</string>
+    <string name="pref_lock">應用程式鎖定</string>
+    <string name="pref_lock_hint">當 WhatsWeb 回到前景時，要求使用這台裝置的鎖定。</string>
+    <string name="pref_secure">在最近使用的應用程式中隱藏</string>
+    <string name="pref_secure_hint">清空最近使用的應用程式預覽，並禁止截圖。</string>
+    <string name="pref_links">在這裡開啟 WhatsApp 連結</string>
+    <string name="pref_links_hint">用 WhatsWeb 處理 wa.me 和聊天連結。</string>
+    <string name="session_clear">清除此連結</string>
+    <string name="session_clear_title">清除此連結？</string>
+    <string name="session_clear_body">這會在這支手機上登出夥伴。之後可以用新的條碼再次連結。</string>
+    <string name="session_clear_confirm">清除</string>
+    <string name="cancel">取消</string>
+    <string name="about_heading">關於</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="about_license">以 GPL-3.0-or-later 授權。</string>
+    <string name="about_disclaimer">獨立於 WhatsApp。頁面本身是官方的 WhatsApp 網頁版。</string>
+    <string name="about_notifications">沒有背景提醒。此應用程式不執行 WhatsApp 的推播服務。</string>
+
+    <string name="lock_title">解鎖 WhatsWeb</string>
+    <string name="lock_subtitle">確認是你本人後才會顯示夥伴。</string>
+    <string name="lock_button">解鎖</string>
+    <string name="lock_unavailable">這台裝置無法確認鎖定，因此已關閉應用程式鎖定。</string>
+    <string name="cd_unlock">解鎖</string>
+
+    <string name="download_started">已開始下載</string>
+    <string name="download_saved">已儲存到下載</string>
+    <string name="download_saved_private">已儲存到 WhatsWeb 的資料夾</string>
+    <string name="download_failed">無法儲存該檔案</string>
+    <string name="download_too_large">該檔案太大，無法從頁面儲存</string>
+    <string name="no_browser">沒有可用於該連結的瀏覽器</string>
+</resources>

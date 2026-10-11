@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Un compagno più discreto</string>
+    <string name="welcome_body">Leggi e rispondi tramite WhatsApp Web, in un layout pensato per il telefono e non per una finestra desktop.</string>
+    <string name="welcome_point_link_title">Collega un dispositivo</string>
+    <string name="welcome_point_link_body">Nell\'app WhatsApp che usi già, apri Dispositivi collegati e scansiona il codice. È lo stesso collegamento che farebbe un browser desktop.</string>
+    <string name="welcome_point_layout_title">Una colonna</string>
+    <string name="welcome_point_layout_body">L\'elenco delle chat e la conversazione aperta occupano lo schermo a turno. Su un tablet puoi disattivarlo e tenere entrambi.</string>
+    <string name="welcome_point_privacy_title">Non viene aggiunto nulla</string>
+    <string name="welcome_point_privacy_body">Non c\'è un account WhatsWeb né analisi. I messaggi passano comunque da WhatsApp, che è un servizio proprietario.</string>
+    <string name="welcome_continue">Apri il compagno</string>
+    <string name="welcome_disclaimer">WhatsWeb è software libero. Non è WhatsApp e non è affiliato a WhatsApp LLC.</string>
+
+    <string name="title_link">Collega un dispositivo</string>
+    <string name="title_chats">Chat</string>
+    <string name="tab_chats">Chat</string>
+    <string name="tab_updates">Aggiornamenti</string>
+    <string name="tab_calls">Chiamate</string>
+    <string name="title_conversation">Conversazione</string>
+    <string name="link_hint">Sul telefono, apri WhatsApp, poi Dispositivi collegati, poi Collega un dispositivo, e inquadra questo codice con la fotocamera.</string>
+    <string name="link_hint_dismiss">Nascondi</string>
+
+    <string name="cd_settings">Impostazioni</string>
+    <string name="cd_back">Indietro</string>
+    <string name="cd_reload">Ricarica</string>
+
+    <string name="exit_again">Premi di nuovo indietro per uscire</string>
+    <string name="error_offline">Il compagno non è raggiungibile in questo momento.</string>
+    <string name="error_retry">Riprova</string>
+    <string name="error_webview_missing">Questo telefono non ha una WebView, quindi il compagno non può essere mostrato.</string>
+    <string name="error_page_stopped">Il compagno si è fermato. Riprova.</string>
+    <string name="error_recovered">WhatsApp ha rimandato questo telefono al suo sito. Riapertura del compagno.</string>
+
+    <string name="share_ready">Il testo condiviso è pronto da incollare in una chat.</string>
+    <string name="share_copy">Copia</string>
+    <string name="share_dismiss">Chiudi</string>
+    <string name="share_copied">Copiato</string>
+    <string name="share_saved">Il file condiviso è stato salvato in Download. Allegalo dalla chat.</string>
+    <string name="share_saved_private">Il file condiviso è stato salvato nella cartella di WhatsWeb.</string>
+    <string name="share_failed">Impossibile conservare quel file condiviso.</string>
+
+    <string name="settings_title">Impostazioni</string>
+    <string name="pref_text_size">Dimensione del testo</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Layout telefono</string>
+    <string name="pref_phone_layout_hint">Mostra l\'elenco delle chat oppure la conversazione.</string>
+    <string name="pref_dynamic">Colori dello sfondo</string>
+    <string name="pref_dynamic_hint">Colora la cornice in base allo sfondo. La conversazione mantiene il tema di WhatsApp.</string>
+    <string name="pref_theme">Cornice</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Chiaro</string>
+    <string name="theme_dark">Scuro</string>
+    <string name="pref_lock">Blocco dell\'app</string>
+    <string name="pref_lock_hint">Chiede il blocco di questo dispositivo quando WhatsWeb torna in primo piano.</string>
+    <string name="pref_secure">Nascondi tra le app recenti</string>
+    <string name="pref_secure_hint">Svuota l\'anteprima delle app recenti e blocca gli screenshot.</string>
+    <string name="pref_links">Apri qui i link di WhatsApp</string>
+    <string name="pref_links_hint">Gestisce i link wa.me e delle chat in WhatsWeb.</string>
+    <string name="session_clear">Cancella questo collegamento</string>
+    <string name="session_clear_title">Cancellare questo collegamento?</string>
+    <string name="session_clear_body">Questo disconnette il compagno su questo telefono. Puoi collegarlo di nuovo con un nuovo codice.</string>
+    <string name="session_clear_confirm">Cancella</string>
+    <string name="cancel">Annulla</string>
+    <string name="about_heading">Informazioni</string>
+    <string name="about_version">Versione %1$s</string>
+    <string name="about_license">Concesso in licenza secondo la GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Indipendente da WhatsApp. La pagina stessa è il compagno ufficiale di WhatsApp Web.</string>
+    <string name="about_notifications">Gli avvisi in background non sono disponibili. Questa app non esegue il servizio push di WhatsApp.</string>
+
+    <string name="lock_title">Sblocca WhatsWeb</string>
+    <string name="lock_subtitle">Conferma che sei tu per mostrare il compagno.</string>
+    <string name="lock_button">Sblocca</string>
+    <string name="lock_unavailable">Questo dispositivo non può confermare un blocco, quindi il blocco dell\'app è stato disattivato.</string>
+    <string name="cd_unlock">Sblocca</string>
+
+    <string name="download_started">Download avviato</string>
+    <string name="download_saved">Salvato in Download</string>
+    <string name="download_saved_private">Salvato nella cartella di WhatsWeb</string>
+    <string name="download_failed">Impossibile salvare quel file</string>
+    <string name="download_too_large">Quel file è troppo grande per essere salvato dalla pagina</string>
+    <string name="no_browser">Nessun browser è disponibile per quel link</string>
+</resources>

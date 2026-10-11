@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">رفيق أهدأ</string>
+    <string name="welcome_body">اقرأ واردد عبر واتساب ويب، بتخطيط مصنوع للهاتف وليس لنافذة سطح المكتب.</string>
+    <string name="welcome_point_link_title">ربط جهاز</string>
+    <string name="welcome_point_link_body">في تطبيق واتساب الذي تستخدمه، افتح الأجهزة المرتبطة وامسح الرمز. إنه رابط الرفيق نفسه الذي ينشئه متصفح سطح المكتب.</string>
+    <string name="welcome_point_layout_title">عمود واحد</string>
+    <string name="welcome_point_layout_body">قائمة الدردشات والمحادثة المفتوحة تتناوبان على ملء الشاشة. على الجهاز اللوحي يمكنك إيقاف ذلك والإبقاء على الاثنين.</string>
+    <string name="welcome_point_privacy_title">لا يُضاف شيء إضافي</string>
+    <string name="welcome_point_privacy_body">لا يوجد حساب WhatsWeb ولا تحليلات. الرسائل ما زالت تمر عبر واتساب، وهي خدمة مملوكة.</string>
+    <string name="welcome_continue">فتح الرفيق</string>
+    <string name="welcome_disclaimer">WhatsWeb برنامج حر. إنه ليس واتساب، وليس تابعًا لشركة WhatsApp LLC.</string>
+
+    <string name="title_link">ربط جهاز</string>
+    <string name="title_chats">الدردشات</string>
+    <string name="tab_chats">الدردشات</string>
+    <string name="tab_updates">المستجدات</string>
+    <string name="tab_calls">المكالمات</string>
+    <string name="title_conversation">محادثة</string>
+    <string name="link_hint">على هاتفك، افتح واتساب، ثم الأجهزة المرتبطة، ثم ربط جهاز، ووجّه الكاميرا إلى هذا الرمز.</string>
+    <string name="link_hint_dismiss">إخفاء</string>
+
+    <string name="cd_settings">الإعدادات</string>
+    <string name="cd_back">رجوع</string>
+    <string name="cd_reload">إعادة التحميل</string>
+
+    <string name="exit_again">اضغط رجوع مرة أخرى للمغادرة</string>
+    <string name="error_offline">يتعذر الوصول إلى الرفيق الآن.</string>
+    <string name="error_retry">إعادة المحاولة</string>
+    <string name="error_webview_missing">هذا الهاتف بلا WebView، لذا لا يمكن عرض الرفيق.</string>
+    <string name="error_page_stopped">توقف الرفيق. حاول مرة أخرى.</string>
+    <string name="error_recovered">أعاد واتساب هذا الهاتف إلى موقعه. يجري فتح الرفيق من جديد.</string>
+
+    <string name="share_ready">النص المشارَك جاهز للصقه في دردشة.</string>
+    <string name="share_copy">نسخ</string>
+    <string name="share_dismiss">تجاهل</string>
+    <string name="share_copied">تم النسخ</string>
+    <string name="share_saved">حُفظ الملف المشارَك في التنزيلات. أرفقه من الدردشة.</string>
+    <string name="share_saved_private">حُفظ الملف المشارَك في مجلد WhatsWeb.</string>
+    <string name="share_failed">تعذر الاحتفاظ بذلك الملف المشارَك.</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="pref_text_size">حجم النص</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">تخطيط الهاتف</string>
+    <string name="pref_phone_layout_hint">عرض قائمة الدردشات أو المحادثة.</string>
+    <string name="pref_dynamic">ألوان الخلفية</string>
+    <string name="pref_dynamic_hint">يلوّن الإطار من خلفية الشاشة. المحادثة تُبقي سمة واتساب الخاصة.</string>
+    <string name="pref_theme">الإطار</string>
+    <string name="theme_system">النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="pref_lock">قفل التطبيق</string>
+    <string name="pref_lock_hint">يطلب قفل هذا الجهاز عندما يعود WhatsWeb إلى المقدمة.</string>
+    <string name="pref_secure">إخفاء من الأخيرة</string>
+    <string name="pref_secure_hint">يفرغ معاينة التطبيقات الأخيرة ويمنع لقطات الشاشة.</string>
+    <string name="pref_links">فتح روابط واتساب هنا</string>
+    <string name="pref_links_hint">يتعامل مع روابط wa.me والدردشات في WhatsWeb.</string>
+    <string name="session_clear">محو هذا الربط</string>
+    <string name="session_clear_title">محو هذا الربط؟</string>
+    <string name="session_clear_body">يؤدي هذا إلى تسجيل خروج الرفيق على هذا الهاتف. يمكنك ربطه من جديد برمز جديد.</string>
+    <string name="session_clear_confirm">محو</string>
+    <string name="cancel">إلغاء</string>
+    <string name="about_heading">حول التطبيق</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_license">مرخّص بموجب GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">مستقل عن واتساب. الصفحة نفسها هي رفيق واتساب ويب الرسمي.</string>
+    <string name="about_notifications">التنبيهات في الخلفية غير متاحة. هذا التطبيق لا يشغّل خدمة الدفع من واتساب.</string>
+
+    <string name="lock_title">فتح قفل WhatsWeb</string>
+    <string name="lock_subtitle">أكّد أنك أنت لعرض الرفيق.</string>
+    <string name="lock_button">فتح القفل</string>
+    <string name="lock_unavailable">هذا الجهاز لا يستطيع تأكيد قفل، لذا أُوقف قفل التطبيق.</string>
+    <string name="cd_unlock">فتح القفل</string>
+
+    <string name="download_started">بدأ التنزيل</string>
+    <string name="download_saved">حُفظ في التنزيلات</string>
+    <string name="download_saved_private">حُفظ في مجلد WhatsWeb</string>
+    <string name="download_failed">تعذر حفظ ذلك الملف</string>
+    <string name="download_too_large">ذلك الملف أكبر من أن يُحفظ من الصفحة</string>
+    <string name="no_browser">لا يوجد متصفح متاح لهذا الرابط</string>
+</resources>

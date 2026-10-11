@@ -164,6 +164,10 @@
     "#whatsweb-tabbar [data-whatsweb-slot='fabs']::before {",
     "  content: none;",
     "}",
+    "#whatsweb-tabbar [data-whatsweb-slot='fabs'] button:disabled,",
+    "#whatsweb-tabbar [data-whatsweb-slot='fabs'] [aria-disabled='true'] {",
+    "  display: none !important;",
+    "}",
     "#whatsweb-tabbar button {",
     "  position: relative !important;",
     "  left: auto !important;",
@@ -783,9 +787,9 @@
     park(chats, bar.querySelector("[data-whatsweb-slot='chats']"));
     park(status, bar.querySelector("[data-whatsweb-slot='status']"));
     park(calls, bar.querySelector("[data-whatsweb-slot='calls']"));
-    labelTab(bar, "chats", "Chats");
-    labelTab(bar, "status", "Updates");
-    labelTab(bar, "calls", "Calls");
+    labelTab(bar, "chats", window.__whatswebTabChats || "Chats");
+    labelTab(bar, "status", window.__whatswebTabUpdates || "Updates");
+    labelTab(bar, "calls", window.__whatswebTabCalls || "Calls");
     var chatsSlot = bar.querySelector("[data-whatsweb-slot='chats']");
     if (badge && chatsSlot) {
       rememberHome(badge);

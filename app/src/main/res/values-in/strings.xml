@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Pendamping yang lebih tenang</string>
+    <string name="welcome_body">Baca dan balas lewat WhatsApp Web, dalam tata letak yang dibuat untuk ponsel, bukan jendela desktop.</string>
+    <string name="welcome_point_link_title">Tautkan perangkat</string>
+    <string name="welcome_point_link_body">Di aplikasi WhatsApp yang sudah Anda pakai, buka Perangkat tertaut dan pindai kodenya. Ini tautan pendamping yang sama seperti yang dibuat browser desktop.</string>
+    <string name="welcome_point_layout_title">Satu kolom</string>
+    <string name="welcome_point_layout_body">Daftar chat dan percakapan yang terbuka bergantian memenuhi layar. Di tablet Anda bisa mematikannya dan menampilkan keduanya.</string>
+    <string name="welcome_point_privacy_title">Tidak ada yang ditambahkan</string>
+    <string name="welcome_point_privacy_body">Tidak ada akun WhatsWeb dan tidak ada analitik. Pesan tetap lewat WhatsApp, yang merupakan layanan berpemilik.</string>
+    <string name="welcome_continue">Buka pendamping</string>
+    <string name="welcome_disclaimer">WhatsWeb adalah perangkat lunak bebas. Ini bukan WhatsApp, dan tidak berafiliasi dengan WhatsApp LLC.</string>
+
+    <string name="title_link">Tautkan perangkat</string>
+    <string name="title_chats">Chat</string>
+    <string name="tab_chats">Chat</string>
+    <string name="tab_updates">Pembaruan</string>
+    <string name="tab_calls">Panggilan</string>
+    <string name="title_conversation">Percakapan</string>
+    <string name="link_hint">Di ponsel, buka WhatsApp, lalu Perangkat tertaut, lalu Tautkan perangkat, dan arahkan kamera ke kode ini.</string>
+    <string name="link_hint_dismiss">Sembunyikan</string>
+
+    <string name="cd_settings">Setelan</string>
+    <string name="cd_back">Kembali</string>
+    <string name="cd_reload">Muat ulang</string>
+
+    <string name="exit_again">Tekan kembali sekali lagi untuk keluar</string>
+    <string name="error_offline">Pendamping tidak dapat dihubungi saat ini.</string>
+    <string name="error_retry">Coba lagi</string>
+    <string name="error_webview_missing">Ponsel ini tidak memiliki WebView, jadi pendamping tidak dapat ditampilkan.</string>
+    <string name="error_page_stopped">Pendamping berhenti. Coba lagi.</string>
+    <string name="error_recovered">WhatsApp mengembalikan ponsel ini ke situsnya. Pendamping dibuka lagi.</string>
+
+    <string name="share_ready">Teks yang dibagikan siap ditempel ke chat.</string>
+    <string name="share_copy">Salin</string>
+    <string name="share_dismiss">Tutup</string>
+    <string name="share_copied">Disalin</string>
+    <string name="share_saved">File yang dibagikan disimpan ke Download. Lampirkan dari chat.</string>
+    <string name="share_saved_private">File yang dibagikan disimpan di folder WhatsWeb.</string>
+    <string name="share_failed">File yang dibagikan itu tidak dapat disimpan.</string>
+
+    <string name="settings_title">Setelan</string>
+    <string name="pref_text_size">Ukuran teks</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Tata letak ponsel</string>
+    <string name="pref_phone_layout_hint">Tampilkan daftar chat atau percakapan.</string>
+    <string name="pref_dynamic">Warna wallpaper</string>
+    <string name="pref_dynamic_hint">Mewarnai bingkai dari wallpaper Anda. Percakapan tetap memakai tema WhatsApp sendiri.</string>
+    <string name="pref_theme">Bingkai</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
+    <string name="pref_lock">Kunci aplikasi</string>
+    <string name="pref_lock_hint">Minta kunci perangkat ini saat WhatsWeb kembali ke latar depan.</string>
+    <string name="pref_secure">Sembunyikan dari terbaru</string>
+    <string name="pref_secure_hint">Mengosongkan pratinjau aplikasi terbaru dan memblokir tangkapan layar.</string>
+    <string name="pref_links">Buka tautan WhatsApp di sini</string>
+    <string name="pref_links_hint">Menangani tautan wa.me dan chat di WhatsWeb.</string>
+    <string name="session_clear">Hapus tautan ini</string>
+    <string name="session_clear_title">Hapus tautan ini?</string>
+    <string name="session_clear_body">Ini mengeluarkan pendamping di ponsel ini. Anda dapat menautkannya lagi dengan kode baru.</string>
+    <string name="session_clear_confirm">Hapus</string>
+    <string name="cancel">Batal</string>
+    <string name="about_heading">Tentang</string>
+    <string name="about_version">Versi %1$s</string>
+    <string name="about_license">Dilisensikan di bawah GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Terpisah dari WhatsApp. Halaman itu sendiri adalah pendamping resmi WhatsApp Web.</string>
+    <string name="about_notifications">Peringatan di latar belakang tidak tersedia. Aplikasi ini tidak menjalankan layanan push WhatsApp.</string>
+
+    <string name="lock_title">Buka kunci WhatsWeb</string>
+    <string name="lock_subtitle">Konfirmasikan bahwa ini Anda untuk menampilkan pendamping.</string>
+    <string name="lock_button">Buka kunci</string>
+    <string name="lock_unavailable">Perangkat ini tidak dapat mengonfirmasi kunci, jadi kunci aplikasi dimatikan.</string>
+    <string name="cd_unlock">Buka kunci</string>
+
+    <string name="download_started">Unduhan dimulai</string>
+    <string name="download_saved">Disimpan ke Download</string>
+    <string name="download_saved_private">Disimpan di folder WhatsWeb</string>
+    <string name="download_failed">File itu tidak dapat disimpan</string>
+    <string name="download_too_large">File itu terlalu besar untuk disimpan dari halaman</string>
+    <string name="no_browser">Tidak ada browser yang tersedia untuk tautan itu</string>
+</resources>

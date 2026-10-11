@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Un compagnon plus discret</string>
+    <string name="welcome_body">Lis et réponds via WhatsApp Web, dans une disposition faite pour un téléphone plutôt que pour une fenêtre d\'ordinateur.</string>
+    <string name="welcome_point_link_title">Associer un appareil</string>
+    <string name="welcome_point_link_body">Dans l\'application WhatsApp que tu utilises déjà, ouvre Appareils connectés et scanne le code. C\'est la même association qu\'un navigateur d\'ordinateur établirait.</string>
+    <string name="welcome_point_layout_title">Une colonne</string>
+    <string name="welcome_point_layout_body">La liste des discussions et la conversation ouverte occupent l\'écran à tour de rôle. Sur une tablette, tu peux désactiver cela et garder les deux.</string>
+    <string name="welcome_point_privacy_title">Rien n\'est ajouté</string>
+    <string name="welcome_point_privacy_body">Il n\'y a pas de compte WhatsWeb ni d\'analyse. Les messages passent toujours par WhatsApp, qui est un service propriétaire.</string>
+    <string name="welcome_continue">Ouvrir le compagnon</string>
+    <string name="welcome_disclaimer">WhatsWeb est un logiciel libre. Ce n\'est pas WhatsApp, et il n\'est pas affilié à WhatsApp LLC.</string>
+
+    <string name="title_link">Associer un appareil</string>
+    <string name="title_chats">Discussions</string>
+    <string name="tab_chats">Discussions</string>
+    <string name="tab_updates">Actus</string>
+    <string name="tab_calls">Appels</string>
+    <string name="title_conversation">Conversation</string>
+    <string name="link_hint">Sur ton téléphone, ouvre WhatsApp, puis Appareils connectés, puis Associer un appareil, et pointe l\'appareil photo vers ce code.</string>
+    <string name="link_hint_dismiss">Masquer</string>
+
+    <string name="cd_settings">Paramètres</string>
+    <string name="cd_back">Retour</string>
+    <string name="cd_reload">Recharger</string>
+
+    <string name="exit_again">Appuie encore sur Retour pour quitter</string>
+    <string name="error_offline">Le compagnon est injoignable pour le moment.</string>
+    <string name="error_retry">Réessayer</string>
+    <string name="error_webview_missing">Ce téléphone n\'a pas de WebView, le compagnon ne peut donc pas s\'afficher.</string>
+    <string name="error_page_stopped">Le compagnon s\'est arrêté. Réessaie.</string>
+    <string name="error_recovered">WhatsApp a renvoyé ce téléphone vers son site. Réouverture du compagnon.</string>
+
+    <string name="share_ready">Le texte partagé est prêt à être collé dans une discussion.</string>
+    <string name="share_copy">Copier</string>
+    <string name="share_dismiss">Fermer</string>
+    <string name="share_copied">Copié</string>
+    <string name="share_saved">Fichier partagé enregistré dans Téléchargements. Joins-le depuis la discussion.</string>
+    <string name="share_saved_private">Fichier partagé enregistré dans le dossier de WhatsWeb.</string>
+    <string name="share_failed">Impossible de conserver ce fichier partagé.</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="pref_text_size">Taille du texte</string>
+    <string name="pref_text_size_value">%1$d %%</string>
+    <string name="pref_phone_layout">Disposition téléphone</string>
+    <string name="pref_phone_layout_hint">Afficher soit la liste des discussions, soit la conversation.</string>
+    <string name="pref_dynamic">Couleurs du fond d\'écran</string>
+    <string name="pref_dynamic_hint">Colore le cadre d\'après ton fond d\'écran. La conversation garde le thème de WhatsApp.</string>
+    <string name="pref_theme">Cadre</string>
+    <string name="theme_system">Système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="pref_lock">Verrouillage de l\'app</string>
+    <string name="pref_lock_hint">Demande le verrouillage de cet appareil quand WhatsWeb revient au premier plan.</string>
+    <string name="pref_secure">Masquer dans les applications récentes</string>
+    <string name="pref_secure_hint">Vide l\'aperçu des applications récentes et bloque les captures d\'écran.</string>
+    <string name="pref_links">Ouvrir les liens WhatsApp ici</string>
+    <string name="pref_links_hint">Ouvre les liens wa.me et de discussion dans WhatsWeb.</string>
+    <string name="session_clear">Effacer cette association</string>
+    <string name="session_clear_title">Effacer cette association ?</string>
+    <string name="session_clear_body">Cela déconnecte le compagnon sur ce téléphone. Tu pourras l\'associer à nouveau avec un nouveau code.</string>
+    <string name="session_clear_confirm">Effacer</string>
+    <string name="cancel">Annuler</string>
+    <string name="about_heading">À propos</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_license">Sous licence GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Indépendant de WhatsApp. La page elle-même est le compagnon officiel WhatsApp Web.</string>
+    <string name="about_notifications">Les alertes en arrière-plan ne sont pas disponibles. Cette application n\'exécute pas le service de notifications de WhatsApp.</string>
+
+    <string name="lock_title">Déverrouiller WhatsWeb</string>
+    <string name="lock_subtitle">Confirme que c\'est bien toi pour afficher le compagnon.</string>
+    <string name="lock_button">Déverrouiller</string>
+    <string name="lock_unavailable">Cet appareil ne peut pas confirmer un verrouillage, le verrouillage de l\'app a donc été désactivé.</string>
+    <string name="cd_unlock">Déverrouiller</string>
+
+    <string name="download_started">Téléchargement lancé</string>
+    <string name="download_saved">Enregistré dans Téléchargements</string>
+    <string name="download_saved_private">Enregistré dans le dossier de WhatsWeb</string>
+    <string name="download_failed">Impossible d\'enregistrer ce fichier</string>
+    <string name="download_too_large">Ce fichier est trop volumineux pour être enregistré depuis la page</string>
+    <string name="no_browser">Aucun navigateur n\'est disponible pour ce lien</string>
+</resources>

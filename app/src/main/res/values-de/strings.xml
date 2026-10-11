@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Ein ruhigerer Begleiter</string>
+    <string name="welcome_body">Lies und antworte über WhatsApp Web, in einem Layout fürs Telefon statt für ein Desktopfenster.</string>
+    <string name="welcome_point_link_title">Gerät verknüpfen</string>
+    <string name="welcome_point_link_body">Öffne in der WhatsApp-App, die du schon nutzt, Verknüpfte Geräte und scanne den Code. Es ist dieselbe Verknüpfung, die ein Desktop-Browser herstellen würde.</string>
+    <string name="welcome_point_layout_title">Eine Spalte</string>
+    <string name="welcome_point_layout_body">Die Chatliste und das offene Gespräch füllen abwechselnd den Bildschirm. Auf einem Tablet kannst du das ausschalten und beides behalten.</string>
+    <string name="welcome_point_privacy_title">Es kommt nichts dazu</string>
+    <string name="welcome_point_privacy_body">Es gibt kein WhatsWeb-Konto und keine Analyse. Nachrichten laufen weiter über WhatsApp, einen proprietären Dienst.</string>
+    <string name="welcome_continue">Begleiter öffnen</string>
+    <string name="welcome_disclaimer">WhatsWeb ist freie Software. Es ist nicht WhatsApp und steht in keiner Verbindung zu WhatsApp LLC.</string>
+
+    <string name="title_link">Gerät verknüpfen</string>
+    <string name="title_chats">Chats</string>
+    <string name="tab_chats">Chats</string>
+    <string name="tab_updates">Aktuelles</string>
+    <string name="tab_calls">Anrufe</string>
+    <string name="title_conversation">Unterhaltung</string>
+    <string name="link_hint">Öffne auf deinem Telefon WhatsApp, dann Verknüpfte Geräte, dann Gerät verknüpfen, und richte die Kamera auf diesen Code.</string>
+    <string name="link_hint_dismiss">Ausblenden</string>
+
+    <string name="cd_settings">Einstellungen</string>
+    <string name="cd_back">Zurück</string>
+    <string name="cd_reload">Neu laden</string>
+
+    <string name="exit_again">Zum Verlassen erneut Zurück drücken</string>
+    <string name="error_offline">Der Begleiter ist gerade nicht erreichbar.</string>
+    <string name="error_retry">Erneut versuchen</string>
+    <string name="error_webview_missing">Dieses Telefon hat kein WebView, deshalb kann der Begleiter nicht angezeigt werden.</string>
+    <string name="error_page_stopped">Der Begleiter wurde beendet. Versuch es noch einmal.</string>
+    <string name="error_recovered">WhatsApp hat dieses Telefon auf seine Website zurückgeschickt. Der Begleiter wird erneut geöffnet.</string>
+
+    <string name="share_ready">Der geteilte Text kann in einen Chat eingefügt werden.</string>
+    <string name="share_copy">Kopieren</string>
+    <string name="share_dismiss">Schließen</string>
+    <string name="share_copied">Kopiert</string>
+    <string name="share_saved">Die geteilte Datei wurde in Downloads gespeichert. Häng sie im Chat an.</string>
+    <string name="share_saved_private">Die geteilte Datei wurde im Ordner von WhatsWeb gespeichert.</string>
+    <string name="share_failed">Die geteilte Datei konnte nicht behalten werden.</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="pref_text_size">Textgröße</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Telefonlayout</string>
+    <string name="pref_phone_layout_hint">Entweder die Chatliste oder das Gespräch anzeigen.</string>
+    <string name="pref_dynamic">Hintergrundfarben</string>
+    <string name="pref_dynamic_hint">Färbt den Rahmen nach deinem Hintergrund. Das Gespräch behält das eigene Design von WhatsApp.</string>
+    <string name="pref_theme">Rahmen</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_dark">Dunkel</string>
+    <string name="pref_lock">App-Sperre</string>
+    <string name="pref_lock_hint">Fragt nach der Sperre dieses Geräts, wenn WhatsWeb wieder in den Vordergrund kommt.</string>
+    <string name="pref_secure">In den letzten Apps verbergen</string>
+    <string name="pref_secure_hint">Blendet die Vorschau der letzten Apps aus und blockiert Screenshots.</string>
+    <string name="pref_links">WhatsApp-Links hier öffnen</string>
+    <string name="pref_links_hint">wa.me- und Chat-Links in WhatsWeb öffnen.</string>
+    <string name="session_clear">Diese Verknüpfung löschen</string>
+    <string name="session_clear_title">Diese Verknüpfung löschen?</string>
+    <string name="session_clear_body">Damit wird der Begleiter auf diesem Telefon abgemeldet. Du kannst ihn mit einem neuen Code wieder verknüpfen.</string>
+    <string name="session_clear_confirm">Löschen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="about_heading">Info</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_license">Lizenziert unter GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Unabhängig von WhatsApp. Die Seite selbst ist der offizielle WhatsApp-Web-Begleiter.</string>
+    <string name="about_notifications">Hinweise im Hintergrund gibt es nicht. Diese App nutzt nicht den Push-Dienst von WhatsApp.</string>
+
+    <string name="lock_title">WhatsWeb entsperren</string>
+    <string name="lock_subtitle">Bestätige, dass du es bist, um den Begleiter anzuzeigen.</string>
+    <string name="lock_button">Entsperren</string>
+    <string name="lock_unavailable">Dieses Gerät kann keine Sperre bestätigen, deshalb wurde die App-Sperre ausgeschaltet.</string>
+    <string name="cd_unlock">Entsperren</string>
+
+    <string name="download_started">Download gestartet</string>
+    <string name="download_saved">In Downloads gespeichert</string>
+    <string name="download_saved_private">Im Ordner von WhatsWeb gespeichert</string>
+    <string name="download_failed">Die Datei konnte nicht gespeichert werden</string>
+    <string name="download_too_large">Die Datei ist zu groß, um sie von der Seite zu speichern</string>
+    <string name="no_browser">Für diesen Link ist kein Browser verfügbar</string>
+</resources>

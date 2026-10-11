@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_title">Более спокойный компаньон</string>
+    <string name="welcome_body">Читай и отвечай через WhatsApp Web в оформлении для телефона, а не для окна на компьютере.</string>
+    <string name="welcome_point_link_title">Привязать устройство</string>
+    <string name="welcome_point_link_body">В приложении WhatsApp, которым ты уже пользуешься, открой «Связанные устройства» и отсканируй код. Это та же привязка, которую создал бы браузер на компьютере.</string>
+    <string name="welcome_point_layout_title">Один столбец</string>
+    <string name="welcome_point_layout_body">Список чатов и открытый разговор по очереди занимают экран. На планшете это можно выключить и оставить оба.</string>
+    <string name="welcome_point_privacy_title">Ничего лишнего не добавляется</string>
+    <string name="welcome_point_privacy_body">Нет учётной записи WhatsWeb и нет аналитики. Сообщения по-прежнему идут через WhatsApp — проприетарный сервис.</string>
+    <string name="welcome_continue">Открыть компаньон</string>
+    <string name="welcome_disclaimer">WhatsWeb — свободное ПО. Это не WhatsApp, и приложение не связано с WhatsApp LLC.</string>
+
+    <string name="title_link">Привязать устройство</string>
+    <string name="title_chats">Чаты</string>
+    <string name="tab_chats">Чаты</string>
+    <string name="tab_updates">Обновления</string>
+    <string name="tab_calls">Звонки</string>
+    <string name="title_conversation">Разговор</string>
+    <string name="link_hint">На телефоне открой WhatsApp, затем «Связанные устройства», затем «Привязать устройство» и наведи камеру на этот код.</string>
+    <string name="link_hint_dismiss">Скрыть</string>
+
+    <string name="cd_settings">Настройки</string>
+    <string name="cd_back">Назад</string>
+    <string name="cd_reload">Обновить</string>
+
+    <string name="exit_again">Нажми «Назад» ещё раз, чтобы выйти</string>
+    <string name="error_offline">Компаньон сейчас недоступен.</string>
+    <string name="error_retry">Повторить</string>
+    <string name="error_webview_missing">На этом телефоне нет WebView, поэтому компаньон нельзя показать.</string>
+    <string name="error_page_stopped">Компаньон остановился. Попробуй ещё раз.</string>
+    <string name="error_recovered">WhatsApp вернул этот телефон на свой сайт. Компаньон открывается снова.</string>
+
+    <string name="share_ready">Общий текст можно вставить в чат.</string>
+    <string name="share_copy">Копировать</string>
+    <string name="share_dismiss">Закрыть</string>
+    <string name="share_copied">Скопировано</string>
+    <string name="share_saved">Общий файл сохранён в «Загрузки». Прикрепи его из чата.</string>
+    <string name="share_saved_private">Общий файл сохранён в папке WhatsWeb.</string>
+    <string name="share_failed">Не удалось сохранить этот общий файл.</string>
+
+    <string name="settings_title">Настройки</string>
+    <string name="pref_text_size">Размер текста</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Телефонный вид</string>
+    <string name="pref_phone_layout_hint">Показывать либо список чатов, либо разговор.</string>
+    <string name="pref_dynamic">Цвета обоев</string>
+    <string name="pref_dynamic_hint">Окрашивает рамку по твоим обоям. Разговор сохраняет тему WhatsApp.</string>
+    <string name="pref_theme">Рамка</string>
+    <string name="theme_system">Система</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="pref_lock">Блокировка приложения</string>
+    <string name="pref_lock_hint">Запрашивать блокировку этого устройства, когда WhatsWeb снова выходит на передний план.</string>
+    <string name="pref_secure">Скрывать в недавних</string>
+    <string name="pref_secure_hint">Скрывает предпросмотр в недавних приложениях и блокирует снимки экрана.</string>
+    <string name="pref_links">Открывать ссылки WhatsApp здесь</string>
+    <string name="pref_links_hint">Открывать ссылки wa.me и чатов в WhatsWeb.</string>
+    <string name="session_clear">Удалить эту привязку</string>
+    <string name="session_clear_title">Удалить эту привязку?</string>
+    <string name="session_clear_body">Это выходит из компаньона на этом телефоне. Привязать его снова можно новым кодом.</string>
+    <string name="session_clear_confirm">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="about_heading">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_license">Лицензия GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Независимо от WhatsApp. Сама страница — официальный компаньон WhatsApp Web.</string>
+    <string name="about_notifications">Фоновые уведомления недоступны. Это приложение не запускает push-службу WhatsApp.</string>
+
+    <string name="lock_title">Разблокировать WhatsWeb</string>
+    <string name="lock_subtitle">Подтверди, что это ты, чтобы показать компаньон.</string>
+    <string name="lock_button">Разблокировать</string>
+    <string name="lock_unavailable">Это устройство не может подтвердить блокировку, поэтому блокировка приложения выключена.</string>
+    <string name="cd_unlock">Разблокировать</string>
+
+    <string name="download_started">Загрузка началась</string>
+    <string name="download_saved">Сохранено в «Загрузки»</string>
+    <string name="download_saved_private">Сохранено в папке WhatsWeb</string>
+    <string name="download_failed">Не удалось сохранить этот файл</string>
+    <string name="download_too_large">Этот файл слишком большой, чтобы сохранить его со страницы</string>
+    <string name="no_browser">Для этой ссылки нет доступного браузера</string>
+</resources>
