@@ -1,0 +1,16 @@
+WhatsWeb shows the WhatsApp Web companion in a layout made for a phone.
+
+Link it the same way you would link a desktop browser: in the WhatsApp app, open Linked devices and scan the code. Chats then use the full screen, and the open conversation does too. Text size can be changed in settings. Settings and reload stay over the page, so the companion keeps the full screen.
+
+The app adds a few things a bare page does not:
+
+• A one-column phone layout, with both panes still available on a larger screen
+• System downloads for photos, voice notes, and other files
+• Share-in for text, and a place to keep shared files so you can attach them
+• Optional app lock, using this device's own lock
+• An option to hide the app from the recent-apps list
+• wa.me and group links, if you turn that on
+
+WhatsWeb is free software under GPL-3.0-or-later. It is not affiliated with WhatsApp. There is no account, no advertising, and no analytics. The conversation itself is still WhatsApp Web, a proprietary service, so F-Droid shows the NonFreeNet anti-feature.
+
+Background alerts are not included. This app does not run WhatsApp's push service. Notifications while the page is open are the ones the page itself can show.

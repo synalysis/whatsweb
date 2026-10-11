@@ -1,0 +1,58 @@
+# WhatsWeb
+
+WhatsWeb is a free Android app that shows the [WhatsApp Web](https://web.whatsapp.com/) companion in a layout meant for a phone. You link it from the WhatsApp app you already use, the same way you would link a desktop browser: **Linked devices → Link a device**, then scan the code.
+
+The page you see is the official companion site. WhatsWeb does not speak WhatsApp's private protocol, and it is not affiliated with WhatsApp LLC. "WhatsApp" is used here only to name that service.
+
+## What the app adds
+
+- A one-column phone layout, so the chat list and the open conversation each use the screen. Turn it off on a larger display and both stay visible.
+- Adjustable text size, with settings and reload kept over the page so the companion stays full screen.
+- Downloads into the system Downloads collection, including files the page exposes as blobs.
+- Share-in: text is kept ready to paste, and shared files are saved so you can attach them from a chat.
+- Optional app lock, using this device's own biometric or PIN prompt.
+- An option to blank the recent-apps preview and block screenshots.
+- Optional handling of `wa.me`, `api.whatsapp.com`, and group invite links. This stays off until you turn it on.
+
+There is no account, no advertising, and no analytics. Background push is not included, because that would mean running WhatsApp's proprietary push service. See [PRIVACY.md](PRIVACY.md).
+
+F-Droid will label the app **NonFreeNet**: it depends entirely on WhatsApp Web, which is a proprietary service.
+
+## Build
+
+The project uses JDK 17 or newer, Android Gradle Plugin 9.0.1, and compile SDK 36.
+
+```sh
+./gradlew test assembleRelease
+```
+
+The release APK is signed with the debug key unless `WHATSWEB_KEYSTORE`, `WHATSWEB_KEYSTORE_PASSWORD`, `WHATSWEB_KEY_ALIAS`, and `WHATSWEB_KEY_PASSWORD` are set. F-Droid discards that signature and signs its own build.
+
+Install a debug build with `./gradlew installDebug`.
+
+## Install from GitHub
+
+Tagged releases publish a signed APK. Download `WhatsWeb-<version>.apk` from the [releases](https://github.com/synalysis/whatsweb/releases) page, or add `https://github.com/synalysis/whatsweb` in [Obtanium](https://github.com/ImranR98/Obtainium). Obtanium installs the APK attached to those releases and picks up later tags.
+
+That APK and an F-Droid build are signed by different keys, so Android will not replace one with the other.
+
+Pushing a tag such as `v1.0.0` runs [`.github/workflows/release.yml`](.github/workflows/release.yml). Before the tag, raise `versionCode` in `app/build.gradle.kts` so Android accepts the update. The workflow needs these repository secrets, taken from one keystore that is kept and reused:
+
+- `WHATSWEB_KEYSTORE_BASE64` — `base64 -w 0 release.jks`
+- `WHATSWEB_KEYSTORE_PASSWORD`
+- `WHATSWEB_KEY_ALIAS`
+- `WHATSWEB_KEY_PASSWORD`
+
+## Publishing on F-Droid
+
+Source, issues, and the F-Droid recipe point at [github.com/synalysis/whatsweb](https://github.com/synalysis/whatsweb). Inclusion is a review, not something this repository can turn on by itself. Before opening a request:
+
+1. Tag the release `v1.0.0` (the version name is `1.0.0`, version code `1`).
+2. Add phone screenshots under `fastlane/metadata/android/en-US/images/phoneScreenshots/`.
+3. Open an issue on [fdroiddata](https://gitlab.com/fdroid/fdroiddata) and include [`fdroid/app.whatsweb.yml`](fdroid/app.whatsweb.yml). The request should mention the NonFreeNet anti-feature and the native pieces above. F-Droid asks apps that wrap a website to add something of their own; the phone layout, downloads, share-in, lock, and link handling are that something.
+
+Descriptions for the store already live in `fastlane/metadata/android/en-US/`.
+
+## License
+
+GPL-3.0-or-later. See [LICENSE](LICENSE).

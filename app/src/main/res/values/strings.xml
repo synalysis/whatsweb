@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WhatsWeb</string>
+
+    <string name="welcome_kicker">WhatsWeb</string>
+    <string name="welcome_title">A quieter companion</string>
+    <string name="welcome_body">Read and reply through WhatsApp Web, in a layout made for a phone rather than a desktop window.</string>
+    <string name="welcome_point_link_title">Link a device</string>
+    <string name="welcome_point_link_body">In the WhatsApp app you already use, open Linked devices and scan the code. It is the same companion link a desktop browser would make.</string>
+    <string name="welcome_point_layout_title">One column</string>
+    <string name="welcome_point_layout_body">The chat list and the open conversation take turns filling the screen. On a tablet you can turn that off and keep both.</string>
+    <string name="welcome_point_privacy_title">Nothing extra is added</string>
+    <string name="welcome_point_privacy_body">There is no WhatsWeb account and no analytics. Messages still go through WhatsApp, which is a proprietary service.</string>
+    <string name="welcome_continue">Open the companion</string>
+    <string name="welcome_disclaimer">WhatsWeb is free software. It is not WhatsApp, and it is not affiliated with WhatsApp LLC.</string>
+
+    <string name="title_link">Link a device</string>
+    <string name="title_chats">Chats</string>
+    <string name="title_conversation">Conversation</string>
+    <string name="link_hint">On your phone, open WhatsApp, then Linked devices, then Link a device, and point the camera at this code.</string>
+    <string name="link_hint_dismiss">Hide</string>
+
+    <string name="cd_settings">Settings</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_reload">Reload</string>
+
+    <string name="exit_again">Press back again to leave</string>
+    <string name="error_offline">The companion can\'t be reached right now.</string>
+    <string name="error_retry">Try again</string>
+    <string name="error_webview_missing">This phone has no WebView, so the companion can\'t be shown.</string>
+    <string name="error_recovered">WhatsApp sent this phone back to its website. Opening the companion again.</string>
+
+    <string name="share_ready">Shared text is ready to paste into a chat.</string>
+    <string name="share_copy">Copy</string>
+    <string name="share_dismiss">Dismiss</string>
+    <string name="share_copied">Copied</string>
+    <string name="share_saved">Saved the shared file to Downloads. Attach it from the chat.</string>
+    <string name="share_saved_private">Saved the shared file in WhatsWeb\'s folder.</string>
+    <string name="share_failed">Couldn\'t keep that shared file.</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="pref_text_size">Text size</string>
+    <string name="pref_text_size_value">%1$d%%</string>
+    <string name="pref_phone_layout">Phone layout</string>
+    <string name="pref_phone_layout_hint">Show either the chat list or the conversation.</string>
+    <string name="pref_dynamic">Wallpaper colors</string>
+    <string name="pref_dynamic_hint">Color the frame from your wallpaper. The conversation keeps WhatsApp\'s own theme.</string>
+    <string name="pref_theme">Frame</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="pref_lock">App lock</string>
+    <string name="pref_lock_hint">Ask for this device\'s lock when WhatsWeb comes back to the foreground.</string>
+    <string name="pref_secure">Hide from recents</string>
+    <string name="pref_secure_hint">Blank the recent-apps preview and block screenshots.</string>
+    <string name="pref_links">Open WhatsApp links here</string>
+    <string name="pref_links_hint">Handle wa.me and chat links in WhatsWeb.</string>
+    <string name="session_clear">Clear this link</string>
+    <string name="session_clear_title">Clear this link?</string>
+    <string name="session_clear_body">This signs the companion out on this phone. You can link it again with a new code.</string>
+    <string name="session_clear_confirm">Clear</string>
+    <string name="cancel">Cancel</string>
+    <string name="about_heading">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_license">Licensed under GPL-3.0-or-later.</string>
+    <string name="about_disclaimer">Independent of WhatsApp. The page itself is the official WhatsApp Web companion.</string>
+    <string name="about_notifications">Background alerts are not available. This app does not run WhatsApp\'s push service.</string>
+
+    <string name="lock_title">Unlock WhatsWeb</string>
+    <string name="lock_subtitle">Confirm it\'s you to show the companion.</string>
+    <string name="lock_button">Unlock</string>
+    <string name="lock_unavailable">This device can\'t confirm a lock, so app lock was turned off.</string>
+    <string name="cd_unlock">Unlock</string>
+
+    <string name="download_started">Download started</string>
+    <string name="download_saved">Saved to Downloads</string>
+    <string name="download_saved_private">Saved in WhatsWeb\'s folder</string>
+    <string name="download_failed">Couldn\'t save that file</string>
+    <string name="download_too_large">That file is too large to save from the page</string>
+    <string name="no_browser">No browser is available for that link</string>
+</resources>

@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Build release APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Prepare release keystore
+        env:
+          WHATSWEB_KEYSTORE_BASE64: ${{ secrets.WHATSWEB_KEYSTORE_BASE64 }}
+          WHATSWEB_KEYSTORE_PASSWORD: ${{ secrets.WHATSWEB_KEYSTORE_PASSWORD }}
+          WHATSWEB_KEY_ALIAS: ${{ secrets.WHATSWEB_KEY_ALIAS }}
+          WHATSWEB_KEY_PASSWORD: ${{ secrets.WHATSWEB_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in WHATSWEB_KEYSTORE_BASE64 WHATSWEB_KEYSTORE_PASSWORD WHATSWEB_KEY_ALIAS WHATSWEB_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "Missing GitHub secret: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "The release APK has to be signed with one keystore that is reused for every version. Android refuses an update signed with a different key."
+            exit 1
+          fi
+          echo "$WHATSWEB_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/whatsweb-release.jks"
+          echo "WHATSWEB_KEYSTORE=$RUNNER_TEMP/whatsweb-release.jks" >> "$GITHUB_ENV"
+
+      - name: Build release APK
+        env:
+          WHATSWEB_KEYSTORE_PASSWORD: ${{ secrets.WHATSWEB_KEYSTORE_PASSWORD }}
+          WHATSWEB_KEY_ALIAS: ${{ secrets.WHATSWEB_KEY_ALIAS }}
+          WHATSWEB_KEY_PASSWORD: ${{ secrets.WHATSWEB_KEY_PASSWORD }}
+        run: ./gradlew test assembleRelease --no-daemon
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$GITHUB_REF_NAME"
+          version="${tag#v}"
+          apk="WhatsWeb-${version}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "$apk"
+          checksum="$(sha256sum "$apk" | cut -d' ' -f1)"
+          notes=$(printf '%s\n' \
+            "Download \`${apk}\` from the assets below, or add https://github.com/synalysis/whatsweb in [Obtanium](https://github.com/ImranR98/Obtainium). Obtanium installs the APK attached to these releases." \
+            "" \
+            "SHA-256: \`${checksum}\`" \
+            "" \
+            "This file is signed with the project's release key. An F-Droid package is signed separately, and Android will not replace one with the other.")
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" --clobber
+            gh release edit "$tag" --title "WhatsWeb ${version}" --notes "$notes"
+          else
+            gh release create "$tag" "$apk" --title "WhatsWeb ${version}" --notes "$notes"
+          fi

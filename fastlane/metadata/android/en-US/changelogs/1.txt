@@ -1,0 +1,1 @@
+First release. Phone layout for the WhatsApp Web companion, adjustable text size, find on page, downloads, optional app lock, and no trackers.

@@ -1,0 +1,33 @@
+AntiFeatures:
+  NonFreeNet:
+    en-US: WhatsApp Web is a proprietary service.
+
+Categories:
+  - Internet
+  - Messaging
+
+License: GPL-3.0-or-later
+AuthorName: WhatsWeb contributors
+
+SourceCode: https://github.com/synalysis/whatsweb
+IssueTracker: https://github.com/synalysis/whatsweb/issues
+Changelog: https://github.com/synalysis/whatsweb/releases
+
+Name: WhatsWeb
+AutoName: WhatsWeb
+Summary: A calm phone window for the WhatsApp Web companion
+
+RepoType: git
+Repo: https://github.com/synalysis/whatsweb.git
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 1
+    commit: v1.0.0
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0
+CurrentVersionCode: 1
