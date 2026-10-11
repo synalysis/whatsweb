@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Build a signed Android App Bundle for Play.
+# The keystore file and password are read from 1Password. See bundle-release.env.
+# This script does not upload the bundle.
+set -euo pipefail
+
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+
+if ! command -v op >/dev/null; then
+  echo "The 1Password CLI (op) is required." >&2
+  exit 1
+fi
+
+# The system Java 25 package is a runtime without javac. Gradle then refuses
+# to compile the release. Prefer a JDK already selected in the environment.
+if [ -z "${JAVA_HOME:-}" ] || [ ! -x "$JAVA_HOME/bin/javac" ]; then
+  if [ -x "$HOME/.local/jdks/temurin-21/bin/javac" ]; then
+    export JAVA_HOME="$HOME/.local/jdks/temurin-21"
+  else
+    echo "Set JAVA_HOME to a JDK that includes javac." >&2
+    exit 1
+  fi
+fi
+
+keystore=$(mktemp)
+trap 'rm -f "$keystore"' EXIT
+chmod 600 "$keystore"
+op read --force --out-file "$keystore" "op://Private/WhatsWeb keystore/release.jks" >/dev/null
+
+export WHATSWEB_KEYSTORE="$keystore"
+export WHATSWEB_KEY_ALIAS=whatsweb
+
+op run --env-file="$root/scripts/bundle-release.env" -- ./gradlew bundleRelease "$@"
+
+echo "Play bundle: app/build/outputs/bundle/release/app-release.aab"

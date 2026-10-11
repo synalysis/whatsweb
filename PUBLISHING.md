@@ -15,6 +15,12 @@ Run `scripts/tag-release` after the version in `app/build.gradle.kts` is committ
 
 That APK and an F-Droid build are signed by different keys, so Android will not replace one with the other.
 
+## Play bundle
+
+Play takes a signed Android App Bundle, not the GitHub APK. `scripts/bundle-release` reads the keystore file and password from the 1Password item `WhatsWeb keystore` in the Private vault (`scripts/bundle-release.env` holds the references), then runs `./gradlew bundleRelease`. The alias is `whatsweb`. Upload `app/build/outputs/bundle/release/app-release.aab`.
+
+That key is the Play upload key. Google signs the copy it delivers, so a Play install will not replace the GitHub or F-Droid install.
+
 ## F-Droid
 
 The recipe is [`fdroid/com.synalysis.whatsweb.yml`](fdroid/com.synalysis.whatsweb.yml). The filename matches the application id. It uses `gradle: yes`, so F-Droid runs the release build. No extra build script is required.
