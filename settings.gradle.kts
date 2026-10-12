@@ -6,11 +6,19 @@ pluginManagement {
     }
 }
 
+val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true" ||
+    startParameter.projectProperties["whatsweb.gecko"] == "true"
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
+        if (geckoEngine) {
+            maven {
+                url = uri("https://maven.mozilla.org/maven2/")
+            }
+        }
     }
 }
 

@@ -1,4 +1,14 @@
 (function () {
+  var root = document.documentElement;
+  if (root && root.dataset && root.dataset.whatswebConfig === "1") {
+    window.__whatswebPhone = root.dataset.whatswebPhone === "true";
+    window.__whatswebQuiet = root.dataset.whatswebQuiet === "true";
+    window.__whatswebHideAi = root.dataset.whatswebHideAi === "true";
+    window.__whatswebHideCalls = root.dataset.whatswebHideCalls === "true";
+    if (root.dataset.whatswebTabChats) window.__whatswebTabChats = root.dataset.whatswebTabChats;
+    if (root.dataset.whatswebTabUpdates) window.__whatswebTabUpdates = root.dataset.whatswebTabUpdates;
+    if (root.dataset.whatswebTabCalls) window.__whatswebTabCalls = root.dataset.whatswebTabCalls;
+  }
   if (window.__whatswebInstalled) {
     if (window.whatswebSetPhone) window.whatswebSetPhone(!!window.__whatswebPhone);
     if (window.whatswebSetQuiet) window.whatswebSetQuiet(!!window.__whatswebQuiet);
@@ -257,8 +267,27 @@
     "html[data-whatsweb='phone'] [role='dialog'] {",
     "  box-sizing: border-box !important;",
     "  min-width: 0 !important;",
-    "  width: 100% !important;",
+    "  max-width: 100vw !important;",
+    "}",
+    "html[data-whatsweb='phone'] [data-whatsweb-dialog] {",
+    "  position: fixed !important;",
+    "  left: 16px !important;",
+    "  right: 16px !important;",
+    "  width: auto !important;",
+    "  max-width: calc(100vw - 32px) !important;",
+    "  min-width: 0 !important;",
+    "  transform: none !important;",
+    "  margin-left: 0 !important;",
+    "  margin-right: 0 !important;",
+    "  box-sizing: border-box !important;",
+    "}",
+    "html[data-whatsweb='phone'] [data-whatsweb-dialog] * {",
+    "  min-width: 0 !important;",
     "  max-width: 100% !important;",
+    "  box-sizing: border-box !important;",
+    "}",
+    "html[data-whatsweb='phone'] [data-whatsweb-dialog] div {",
+    "  flex-wrap: wrap !important;",
     "}",
     "html[data-whatsweb='phone'] [data-testid='confirm-popup'] {",
     "  box-sizing: border-box !important;",
@@ -759,6 +788,11 @@
   }
 
   function markDrawer(drawer, stop) {
+    if (!drawer) return;
+    if (!stop) {
+      drawer.dataset.whatswebDrawer = "1";
+      return;
+    }
     var el = drawer;
     while (el) {
       el.dataset.whatswebDrawer = "1";
@@ -767,10 +801,16 @@
     }
   }
 
+  function onScreen(box) {
+    if (!box || box.width < 40 || box.height < 80) return false;
+    if (box.bottom <= 0 || box.right <= 8) return false;
+    if (box.top >= window.innerHeight || box.left >= window.innerWidth - 8) return false;
+    return true;
+  }
+
   function visibleDrawer(testid) {
     var drawer = document.querySelector("[data-testid='" + testid + "']");
-    var box = drawer && drawer.getBoundingClientRect();
-    if (!drawer || !box || box.width < 40 || box.height < 80) return null;
+    if (!drawer || !onScreen(drawer.getBoundingClientRect())) return null;
     return drawer;
   }
 
@@ -861,18 +901,39 @@
     personObserver.observe(document.documentElement, { childList: true, subtree: true });
   }
 
+  function visibleSideDrawer() {
+    var nodes = document.querySelectorAll("[data-testid*='drawer']");
+    var found = null;
+    var foundWidth = 0;
+    for (var i = 0; i < nodes.length; i++) {
+      var name = nodes[i].getAttribute("data-testid") || "";
+      if (name === "drawer-left" || name === "drawer-middle" || name === "drawer-right" || name === "drawer-fullscreen" || name === "new-chat-drawer") continue;
+      if (nodes[i].closest && nodes[i].closest("[data-testid='drawer-left'], #pane-side")) continue;
+      var box = nodes[i].getBoundingClientRect();
+      if (!onScreen(box) || box.height < window.innerHeight * 0.45) continue;
+      if (box.width > window.innerWidth - 24) continue;
+      if (box.width > foundWidth) {
+        found = nodes[i];
+        foundWidth = box.width;
+      }
+    }
+    return found;
+  }
+
   function fitOverlay() {
     settlePersonInfo();
     clearOverlay();
     var chat = visibleDrawer("new-chat-drawer");
     if (chat) markDrawer(chat, document.querySelector("[data-testid='drawer-left']"));
-    var info = visibleDrawer("chat-info-drawer");
-    var right = document.querySelector("[data-testid='drawer-right']");
-    if (info && right && right.contains(info)) markDrawer(info, right);
-    if (chat || (info && right && right.contains(info))) {
-      document.documentElement.dataset.whatswebDrawer = "1";
+    var sheet = visibleSideDrawer();
+    if (sheet) {
+      var shell = sheet.closest
+        ? sheet.closest("[data-testid='drawer-right'], [data-testid='drawer-fullscreen']")
+        : null;
+      markDrawer(sheet, shell || sheet);
     }
-    reportCover(!!(info && right && right.contains(info)));
+    if (chat || sheet) document.documentElement.dataset.whatswebDrawer = "1";
+    reportCover(!!sheet);
   }
 
   function labelTab(bar, name, text) {
@@ -1143,6 +1204,7 @@
   function hideChatCalls() {
     var previous = document.querySelectorAll("[data-whatsweb-hide-call]");
     for (var i = 0; i < previous.length; i++) delete previous[i].dataset.whatswebHideCall;
+    if (window.__whatswebHideCalls === false) return;
     var header = document.querySelector("[data-testid='conversation-header']");
     if (!header) return;
     var buttons = header.querySelectorAll("button, [role='button']");
@@ -1392,7 +1454,42 @@
     }
   }
 
+  function fitDialogs() {
+    var previous = document.querySelectorAll("[data-whatsweb-dialog]");
+    for (var i = 0; i < previous.length; i++) {
+      previous[i].style.top = "";
+      delete previous[i].dataset.whatswebDialog;
+    }
+    if (!window.__whatswebPhone) return;
+    var roots = document.querySelectorAll("[role='dialog'], [data-testid='popup'], [data-testid='confirm-popup']");
+    for (var r = 0; r < roots.length; r++) {
+      var nodes = roots[r].querySelectorAll("div, section");
+      var card = null;
+      var cardWidth = Infinity;
+      for (var n = 0; n < nodes.length; n++) {
+        var box = nodes[n].getBoundingClientRect();
+        if (box.height < 100 || box.height > window.innerHeight * 0.92) continue;
+        if (box.width < window.innerWidth * 0.45) continue;
+        var overflows = box.left < -2 || box.right > window.innerWidth + 2 || box.width > window.innerWidth - 8;
+        if (!overflows) continue;
+        if (box.width < cardWidth) {
+          card = nodes[n];
+          cardWidth = box.width;
+        }
+      }
+      if (!card) continue;
+      var place = card.getBoundingClientRect();
+      card.dataset.whatswebDialog = "1";
+      var top = place.top;
+      if (top < 12) top = 12;
+      var limit = window.innerHeight - 12;
+      if (top + Math.min(place.height, limit - 12) > limit) top = Math.max(12, limit - Math.min(place.height, limit - 12));
+      card.style.top = top + "px";
+    }
+  }
+
   function apply() {
+    fitDialogs();
     hideDownloadBanner();
     placeQuietRoom();
     placeStatusHeader();
@@ -1473,7 +1570,9 @@
     if (!window.__whatswebPhone) return;
     if (personInChat(event.target) && !visibleDrawer("drawer-right")) armPersonInfo();
     window.setTimeout(function () {
-      if (window.__whatswebPhone) fitOverlay();
+      if (!window.__whatswebPhone) return;
+      fitOverlay();
+      fitDialogs();
     }, 300);
     var target = event.target;
     if (!target || !target.closest) return;

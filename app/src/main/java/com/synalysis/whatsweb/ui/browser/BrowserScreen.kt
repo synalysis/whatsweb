@@ -50,8 +50,9 @@ import com.synalysis.whatsweb.prefs.UserPreferences
 import com.synalysis.whatsweb.ui.AppState
 import com.synalysis.whatsweb.ui.WebSlot
 import com.synalysis.whatsweb.web.LinkRouter
+import com.synalysis.whatsweb.web.PageCommands
 import com.synalysis.whatsweb.web.WebHost
-import com.synalysis.whatsweb.web.createCompanionWebView
+import com.synalysis.whatsweb.web.createCompanionPage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,19 +80,13 @@ fun BrowserScreen(
     LaunchedEffect(state.pendingUrl) {
         val url = state.pendingUrl ?: return@LaunchedEffect
         state.pendingUrl = null
-        webSlot.view?.loadUrl(url)
+        webSlot.page?.loadUrl(url)
     }
     LaunchedEffect(prefs.phoneLayout) {
-        webSlot.view?.evaluateJavascript(
-            "window.whatswebSetPhone && window.whatswebSetPhone(${prefs.phoneLayout})",
-            null,
-        )
+        webSlot.page?.runScript(PageCommands.setPhone(prefs.phoneLayout))
     }
     LaunchedEffect(prefs.hideAi) {
-        webSlot.view?.evaluateJavascript(
-            "window.whatswebSetHideAi && window.whatswebSetHideAi(${prefs.hideAi})",
-            null,
-        )
+        webSlot.page?.runScript(PageCommands.setHideAi(prefs.hideAi))
     }
     LaunchedEffect(state.notice) {
         val message = state.notice ?: return@LaunchedEffect
@@ -99,13 +94,13 @@ fun BrowserScreen(
         snackbarHostState.showSnackbar(message)
     }
     BackHandler {
-        val view = webSlot.view
-        if (view == null) {
+        val page = webSlot.page
+        if (page == null) {
             onLeave()
             return@BackHandler
         }
-        view.evaluateJavascript("window.whatswebBack ? window.whatswebBack() : false") { raw ->
-            if (raw != "true") onLeave()
+        page.goBack { handled ->
+            if (!handled) onLeave()
         }
     }
 
@@ -183,13 +178,13 @@ fun BrowserScreen(
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
                         factory = { context ->
-                            val existing = webSlot.view
+                            val existing = webSlot.page
                             if (existing != null) {
-                                (existing.parent as? ViewGroup)?.removeView(existing)
-                                existing
+                                (existing.view.parent as? ViewGroup)?.removeView(existing.view)
+                                existing.view
                             } else {
                                 try {
-                                    createCompanionWebView(
+                                    createCompanionPage(
                                         context = context,
                                         state = state,
                                         host = host,
@@ -200,14 +195,14 @@ fun BrowserScreen(
                                         textZoom = prefs.textZoom,
                                     ).also { created ->
                                         created.setBackgroundColor(pageColor)
-                                        val restored = savedState?.let { created.restoreState(it) } != null
+                                        val restored = savedState?.let { created.restoreState(it) } == true
                                         val pending = state.pendingUrl
                                         state.pendingUrl = null
                                         when {
                                             pending != null -> created.loadUrl(pending)
                                             !restored -> created.loadUrl(LinkRouter.HOME)
                                         }
-                                    }
+                                    }.view
                                 } catch (_: Exception) {
                                     Handler(Looper.getMainLooper()).post {
                                         webMissing = true
@@ -216,11 +211,11 @@ fun BrowserScreen(
                                 }
                             }
                         },
-                        update = { view ->
-                            (view as? WebView)?.settings?.textZoom = prefs.textZoom
+                        update = {
+                            webSlot.page?.setTextZoom(prefs.textZoom)
                         },
                         onRelease = { released ->
-                            if (released is WebView) webSlot.detach(released)
+                            webSlot.detach(released)
                         },
                     )
                     if (state.mainFrameError) {
@@ -229,14 +224,14 @@ fun BrowserScreen(
                             action = stringResource(R.string.error_retry),
                             onAction = {
                                 state.mainFrameError = false
-                                webSlot.view?.loadUrl(LinkRouter.HOME)
+                                webSlot.page?.loadUrl(LinkRouter.HOME)
                             },
                         )
                     }
                     if (prefs.phoneLayout && state.pane == "chat" && !state.infoOpen) {
                         IconButton(
                             onClick = {
-                                webSlot.view?.evaluateJavascript("window.whatswebBack()", null)
+                                webSlot.page?.goBack { }
                             },
                             modifier = Modifier
                                 .align(Alignment.TopStart)
@@ -292,7 +287,7 @@ private fun MessagePane(
     }
 }
 
-fun clearCompanionSession(view: WebView?) {
+internal fun clearWebViewSession(view: WebView?) {
     val main = Handler(Looper.getMainLooper())
     CookieManager.getInstance().removeAllCookies {
         main.post {

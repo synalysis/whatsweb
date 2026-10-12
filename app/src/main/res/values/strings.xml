@@ -71,6 +71,8 @@
     <string name="about_license">Licensed under GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Independent of WhatsApp. The page itself is the official WhatsApp Web companion.</string>
     <string name="about_notifications">Background alerts are not available. This app does not run WhatsApp\'s push service.</string>
+    <string name="screen_share_active">Sharing your screen</string>
+    <string name="screen_share_stop">Stop</string>
 
     <string name="lock_title">Unlock WhatsWeb</string>
     <string name="lock_subtitle">Confirm it\'s you to show the companion.</string>

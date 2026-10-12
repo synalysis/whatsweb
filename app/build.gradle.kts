@@ -12,6 +12,8 @@ val releaseKeyAlias = System.getenv("WHATSWEB_KEY_ALIAS")
 val releaseKeyPassword = System.getenv("WHATSWEB_KEY_PASSWORD")
 val releaseSigningValues = listOf(releaseKeystore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
 val releaseSigningConfigured = releaseSigningValues.all { !it.isNullOrBlank() }
+val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true" ||
+    gradle.startParameter.projectProperties["whatsweb.gecko"] == "true"
 if (releaseSigningValues.any { !it.isNullOrBlank() } && !releaseSigningConfigured) {
     throw GradleException(
         "Release signing requires WHATSWEB_KEYSTORE, WHATSWEB_KEYSTORE_PASSWORD, WHATSWEB_KEY_ALIAS, and WHATSWEB_KEY_PASSWORD.",
@@ -26,8 +28,14 @@ android {
         applicationId = "com.synalysis.whatsweb"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 5
+        versionName = "1.0.4"
+        if (geckoEngine) {
+            // A separate install so WhatsWeb Calls does not replace the
+            // system-WebView packages used for F-Droid, direct download, and Play.
+            // versionName and versionCode stay in lockstep with that app.
+            applicationId = "com.synalysis.whatsweb.gecko"
+        }
     }
 
     signingConfigs {
@@ -42,6 +50,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            if (geckoEngine) {
+                ndk {
+                    // The emulator is x86_64 and a phone is arm64.
+                    abiFilters += listOf("arm64-v8a", "x86_64")
+                }
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -53,6 +69,12 @@ android {
             // signs that APK itself; CI uses the project keystore.
             if (releaseSigningConfigured) {
                 signingConfig = signingConfigs.getByName("release")
+            }
+            if (geckoEngine) {
+                ndk {
+                    // Phones only. The debug build still includes the emulator ABI.
+                    abiFilters += "arm64-v8a"
+                }
             }
         }
     }
@@ -76,11 +98,36 @@ android {
     lint {
         abortOnError = true
     }
+
+    sourceSets.named("main") {
+        if (geckoEngine) {
+            java.srcDir("src/engineGecko/java")
+            res.srcDir("src/engineGecko/res")
+        } else {
+            java.srcDir("src/engineWebview/java")
+        }
+    }
+}
+
+if (geckoEngine) {
+    androidComponents {
+        onVariants { variant ->
+            variant.sources.manifests.addStaticManifestFile("src/engineGecko/AndroidManifest.xml")
+        }
+    }
 }
 
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
+if (geckoEngine) {
+    configurations.configureEach {
+        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
+        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.21")
+        resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.2.21")
     }
 }
 
@@ -99,6 +146,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.webkit:webkit:1.14.0")
+    if (geckoEngine) {
+        // The plain artifact carries every CPU architecture. The emulator is
+        // x86_64 and a phone is arm64; the ndk abi filters keep those two.
+        implementation("org.mozilla.geckoview:geckoview:149.0.20260403140140") {
+            exclude(group = "com.google.android.gms", module = "play-services-fido")
+        }
+    }
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.lifecycle:lifecycle-process:2.8.7")
 

@@ -2,7 +2,7 @@
 // then disable the voice and video buttons with an error. WebView cannot provide
 // the real buffer those calls need.
 (function () {
-  var version = "__CHROME_VERSION__";
+  var version = window.__whatswebChromeVersion || "131.0.0.0";
   var major = version.split(".")[0];
   try {
     Object.defineProperty(navigator, "platform", {

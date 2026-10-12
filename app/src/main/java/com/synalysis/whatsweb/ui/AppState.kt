@@ -1,7 +1,9 @@
 package com.synalysis.whatsweb.ui
 
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import com.synalysis.whatsweb.web.CompanionPage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,11 +26,17 @@ class AppState {
 }
 
 class WebSlot {
+    var page: CompanionPage? = null
+        private set
     var view: WebView? = null
         private set
     private var downloads: DownloadHandler? = null
     private val destroyed = Collections.newSetFromMap(WeakHashMap<WebView, Boolean>())
     private val popups = LinkedHashSet<WebView>()
+
+    fun bind(page: CompanionPage) {
+        this.page = page
+    }
 
     fun attach(web: WebView, handler: DownloadHandler) {
         downloads?.close()
@@ -36,9 +44,10 @@ class WebSlot {
         downloads = handler
     }
 
-    fun detach(web: WebView) {
-        if (web in destroyed) return
-        (web.parent as? ViewGroup)?.removeView(web)
+    fun detach(view: View) {
+        val web = view as? WebView
+        if (web != null && web in destroyed) return
+        (view.parent as? ViewGroup)?.removeView(view)
     }
 
     fun trackPopup(popup: WebView) {
@@ -61,6 +70,7 @@ class WebSlot {
             downloads?.close()
             downloads = null
             view = null
+            if (page?.view === target) page = null
         }
         (target.parent as? ViewGroup)?.removeView(target)
         try {
@@ -71,6 +81,8 @@ class WebSlot {
 
     fun destroyCurrent() {
         popups.toList().forEach { closePopup(it) }
-        destroy(view)
+        val current = page
+        page = null
+        if (current != null) current.destroy() else destroy(view)
     }
 }

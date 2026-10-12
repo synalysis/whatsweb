@@ -1,6 +1,8 @@
 package com.synalysis.whatsweb
 
 import android.Manifest
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -19,6 +21,7 @@ import android.webkit.WebChromeClient
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -57,6 +60,7 @@ class MainActivity : AppCompatActivity() {
     private val mainThread = Handler(Looper.getMainLooper())
 
     private var uploadCallback: ValueCallback<Array<Uri>>? = null
+    private var activityResult: Pair<(Intent) -> Unit, () -> Unit>? = null
     private var permissionsOpen = true
     private val permissionQueue = ArrayDeque<PermissionWait>()
 
@@ -72,6 +76,18 @@ class MainActivity : AppCompatActivity() {
         val uris = WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
         uploadCallback?.onReceiveValue(uris)
         uploadCallback = null
+    }
+
+    private val intentSender = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        val wait = activityResult
+        activityResult = null
+        if (result.resultCode == Activity.RESULT_OK) {
+            wait?.first?.invoke(result.data ?: Intent())
+        } else {
+            wait?.second?.invoke()
+        }
     }
 
     private val runtimePermissions = registerForActivityResult(
@@ -96,6 +112,9 @@ class MainActivity : AppCompatActivity() {
             openExternal = ::openExternal,
             openFileChooser = ::openFileChooser,
             requestWebPermissions = ::requestWebPermissions,
+            requestCapture = ::requestCapture,
+            startForResult = ::startForResult,
+            requestNotifications = ::requestNotifications,
             requestLegacyStorage = ::requestLegacyStorage,
             message = { text -> state.notice = text },
             onRendererGone = webSlot::destroy,
@@ -128,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                         state.linked = null
                         state.pane = "list"
                         state.pageTitle = null
-                        com.synalysis.whatsweb.ui.browser.clearCompanionSession(webSlot.view)
+                        webSlot.page?.clearData()
                     },
                     canUseLock = ::canUseLock,
                 )
@@ -144,18 +163,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!locked) webSlot.view?.onResume()
+        if (!locked) webSlot.page?.resume()
     }
 
     override fun onPause() {
-        webSlot.view?.onPause()
+        webSlot.page?.pause()
         CookieManager.getInstance().flush()
         super.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        webSlot.view?.saveState(outState)
+        webSlot.page?.saveState(outState)
     }
 
     override fun onDestroy() {
@@ -165,6 +184,8 @@ class MainActivity : AppCompatActivity() {
         permissionQueue.clear()
         uploadCallback?.onReceiveValue(null)
         uploadCallback = null
+        activityResult?.second?.invoke()
+        activityResult = null
         webSlot.destroyCurrent()
         pending.forEach { wait ->
             try {
@@ -217,7 +238,7 @@ class MainActivity : AppCompatActivity() {
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     locked = false
-                    webSlot.view?.onResume()
+                    webSlot.page?.resume()
                 }
             },
         ).authenticate(prompt.build())
@@ -266,6 +287,56 @@ class MainActivity : AppCompatActivity() {
             onGranted = { request.grant(grant) },
             onDenied = { request.deny() },
         )
+    }
+
+    private fun requestCapture(
+        camera: Boolean,
+        microphone: Boolean,
+        onGranted: () -> Unit,
+        onDenied: () -> Unit,
+    ) {
+        val needed = buildList {
+            if (camera) add(Manifest.permission.CAMERA)
+            if (microphone) add(Manifest.permission.RECORD_AUDIO)
+        }.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (needed.isEmpty()) {
+            onGranted()
+            return
+        }
+        requestPermissions(needed.toTypedArray(), onGranted, onDenied)
+    }
+
+    private fun startForResult(
+        pending: PendingIntent,
+        onResult: (Intent) -> Unit,
+        onCancel: () -> Unit,
+    ) {
+        if (!permissionsOpen || activityResult != null) {
+            onCancel()
+            return
+        }
+        activityResult = onResult to onCancel
+        try {
+            intentSender.launch(IntentSenderRequest.Builder(pending).build())
+        } catch (_: Exception) {
+            activityResult = null
+            onCancel()
+        }
+    }
+
+    private fun requestNotifications(onGranted: () -> Unit, onDenied: () -> Unit) {
+        if (Build.VERSION.SDK_INT < 33) {
+            onGranted()
+            return
+        }
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            onGranted()
+            return
+        }
+        requestPermissions(arrayOf(permission), onGranted, onDenied)
     }
 
     private fun requestLegacyStorage(onGranted: () -> Unit, onDenied: () -> Unit) {

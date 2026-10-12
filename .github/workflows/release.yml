@@ -47,12 +47,19 @@ jobs:
           echo "$WHATSWEB_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/whatsweb-release.jks"
           echo "WHATSWEB_KEYSTORE=$RUNNER_TEMP/whatsweb-release.jks" >> "$GITHUB_ENV"
 
-      - name: Build release APK
+      - name: Build release APKs
         env:
           WHATSWEB_KEYSTORE_PASSWORD: ${{ secrets.WHATSWEB_KEYSTORE_PASSWORD }}
           WHATSWEB_KEY_ALIAS: ${{ secrets.WHATSWEB_KEY_ALIAS }}
           WHATSWEB_KEY_PASSWORD: ${{ secrets.WHATSWEB_KEY_PASSWORD }}
-        run: ./gradlew test lintRelease assembleRelease --no-daemon
+        run: |
+          set -euo pipefail
+          ./gradlew test lintRelease assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/whatsweb.apk"
+          # Same versionName and versionCode. A second install, so the property
+          # stays off the F-Droid and Play builds.
+          ./gradlew assembleRelease -Pwhatsweb.gecko=true --no-daemon --rerun-tasks
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/whatsweb-calls.apk"
 
       - name: Check tag matches versionName
         run: |
@@ -64,12 +71,24 @@ jobs:
             echo "aapt was not found under $sdk/build-tools"
             exit 1
           fi
-          badging="$("$aapt" dump badging app/build/outputs/apk/release/app-release.apk)"
-          name="$(printf '%s\n' "$badging" | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")"
-          if [ "$name" != "$tag" ]; then
-            echo "Tag v$tag does not match embedded versionName '$name'"
-            exit 1
-          fi
+          check() {
+            local apk="$1"
+            local want_pkg="$2"
+            local badging name pkg
+            badging="$("$aapt" dump badging "$apk")"
+            name="$(printf '%s\n' "$badging" | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")"
+            pkg="$(printf '%s\n' "$badging" | sed -n "s/^package: name='\([^']*\)'.*/\1/p")"
+            if [ "$name" != "$tag" ]; then
+              echo "$apk versionName '$name' does not match tag v$tag"
+              exit 1
+            fi
+            if [ "$pkg" != "$want_pkg" ]; then
+              echo "$apk package '$pkg' is not $want_pkg"
+              exit 1
+            fi
+          }
+          check "$RUNNER_TEMP/whatsweb.apk" com.synalysis.whatsweb
+          check "$RUNNER_TEMP/whatsweb-calls.apk" com.synalysis.whatsweb.gecko
 
       - name: Publish GitHub release
         env:
@@ -79,17 +98,26 @@ jobs:
           tag="$GITHUB_REF_NAME"
           version="${tag#v}"
           apk="WhatsWeb-${version}.apk"
-          cp app/build/outputs/apk/release/app-release.apk "$apk"
-          checksum="$(sha256sum "$apk" | cut -d' ' -f1)"
+          calls="WhatsWeb-Calls-${version}.apk"
+          cp "$RUNNER_TEMP/whatsweb.apk" "$apk"
+          cp "$RUNNER_TEMP/whatsweb-calls.apk" "$calls"
+          sum_main="$(sha256sum "$apk" | cut -d' ' -f1)"
+          sum_calls="$(sha256sum "$calls" | cut -d' ' -f1)"
           notes=$(printf '%s\n' \
-            "Download \`${apk}\` from the assets below, or add https://github.com/synalysis/whatsweb in [Obtanium](https://github.com/ImranR98/Obtainium). Obtanium installs the APK attached to these releases." \
+            "Download \`${apk}\` or \`${calls}\` from the assets below. Both are version ${version}." \
             "" \
-            "SHA-256: \`${checksum}\`" \
+            "WhatsWeb Calls is a separate install with voice and video calls, alerts while the app is open, and screen sharing. It can sit beside WhatsWeb." \
             "" \
-            "This file is signed with the project's release key. An F-Droid package is signed separately, and Android will not replace one with the other.")
+            "In [Obtainium](https://github.com/ImranR98/Obtainium), add https://github.com/synalysis/whatsweb twice. Give WhatsWeb the APK filter \`^WhatsWeb-[0-9].*\\.apk$\` and WhatsWeb Calls the filter \`^WhatsWeb-Calls-.*\\.apk$\`." \
+            "" \
+            "SHA-256:" \
+            "- \`${apk}\`: \`${sum_main}\`" \
+            "- \`${calls}\`: \`${sum_calls}\`" \
+            "" \
+            "Both files are signed with the project's release key. An F-Droid package is signed separately, and Android will not replace one with the other.")
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$apk" --clobber
+            gh release upload "$tag" "$apk" "$calls" --clobber
             gh release edit "$tag" --title "WhatsWeb ${version}" --notes "$notes"
           else
-            gh release create "$tag" "$apk" --title "WhatsWeb ${version}" --notes "$notes"
+            gh release create "$tag" "$apk" "$calls" --title "WhatsWeb ${version}" --notes "$notes"
           fi

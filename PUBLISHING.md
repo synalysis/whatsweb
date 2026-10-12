@@ -13,7 +13,11 @@ Run `scripts/tag-release` after the version in `app/build.gradle.kts` is committ
 - `WHATSWEB_KEY_ALIAS`
 - `WHATSWEB_KEY_PASSWORD`
 
-That APK and an F-Droid build are signed by different keys, so Android will not replace one with the other.
+That workflow also builds WhatsWeb Calls (`-Pwhatsweb.gecko=true`) and attaches `WhatsWeb-Calls-<version>.apk` to the same release. Both APKs use the `versionName` and `versionCode` in `app/build.gradle.kts`. Calls is a separate application id, `com.synalysis.whatsweb.gecko`, and its release APK contains the arm64 phone build. The debug Calls build still includes the emulator ABI.
+
+Obtainium needs an APK filter because the release has two APKs: `^WhatsWeb-[0-9].*\.apk$` for WhatsWeb and `^WhatsWeb-Calls-.*\.apk$` for WhatsWeb Calls.
+
+The GitHub APKs and an F-Droid build are signed by different keys, so Android will not replace one with the other. F-Droid builds WhatsWeb only.
 
 ## Play bundle
 
@@ -27,4 +31,4 @@ The recipe is [`fdroid/com.synalysis.whatsweb.yml`](fdroid/com.synalysis.whatswe
 
 Store text, the icon, and the phone screenshots live under `fastlane/metadata/android/en-US/`. F-Droid reads the screenshots from `images/phoneScreenshots/`.
 
-Inclusion is a review. The recipe builds the tag named in `commit` (currently `v1.0.3`, version name `1.0.3`, version code `4`), so that tag has to exist first. Open a request on [fdroiddata](https://gitlab.com/fdroid/fdroiddata) and attach the recipe. A first inclusion can instead go to the [Request for Packaging](https://gitlab.com/fdroid/rfp/-/issues) tracker. The request should mention the NonFreeNet anti-feature and the app-side features: the phone layout, downloads, share-in, lock, and link handling.
+Inclusion is a review. The recipe builds the tag named in `commit` (currently `v1.0.4`, version name `1.0.4`, version code `5`), so that tag has to exist first. Open a request on [fdroiddata](https://gitlab.com/fdroid/fdroiddata) and attach the recipe. A first inclusion can instead go to the [Request for Packaging](https://gitlab.com/fdroid/rfp/-/issues) tracker. The request should mention the NonFreeNet anti-feature and the app-side features: the phone layout, downloads, share-in, lock, and link handling.

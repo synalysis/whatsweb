@@ -110,7 +110,7 @@ fun WhatswebApp(
                 onReload = {
                     showSettings = false
                     state.mainFrameError = false
-                    webSlot.view?.reload()
+                    webSlot.page?.reload()
                 },
                 onClearSession = {
                     showSettings = false

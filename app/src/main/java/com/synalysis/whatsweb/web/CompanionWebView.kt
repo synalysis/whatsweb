@@ -19,7 +19,6 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.webkit.JavaScriptReplyProxy
-import org.json.JSONObject
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.synalysis.whatsweb.ui.AppState
@@ -30,6 +29,18 @@ class WebHost(
     val openExternal: (String) -> Unit,
     val openFileChooser: (ValueCallback<Array<Uri>>?, WebChromeClient.FileChooserParams?) -> Unit,
     val requestWebPermissions: (PermissionRequest, Array<String>) -> Unit,
+    val requestCapture: (
+        camera: Boolean,
+        microphone: Boolean,
+        onGranted: () -> Unit,
+        onDenied: () -> Unit,
+    ) -> Unit,
+    val startForResult: (
+        pending: android.app.PendingIntent,
+        onResult: (android.content.Intent) -> Unit,
+        onCancel: () -> Unit,
+    ) -> Unit,
+    val requestNotifications: (onGranted: () -> Unit, onDenied: () -> Unit) -> Unit,
     val requestLegacyStorage: (onGranted: () -> Unit, onDenied: () -> Unit) -> Unit,
     val message: (String) -> Unit,
     val onRendererGone: (WebView) -> Unit,
@@ -51,9 +62,8 @@ fun createCompanionWebView(
     val chromeVersion = DesktopIdentity.chromeVersion(
         WebViewCompat.getCurrentWebViewPackage(context)?.versionName,
     )
-    val identity = context.assets.open("desktop_identity.js").bufferedReader().use { it.readText() }
-        .replace("__CHROME_VERSION__", chromeVersion)
-    val layout = context.assets.open("phone_layout.js").bufferedReader().use { it.readText() }
+    val scripts = PageScripts(context)
+    val identity = scripts.identity(chromeVersion)
     val downloads = DownloadHandler(context, host.message, host.requestLegacyStorage)
     val session = SessionBridge(state)
     val main = Handler(Looper.getMainLooper())
@@ -212,7 +222,7 @@ fun createCompanionWebView(
             override fun onPageFinished(view: WebView, url: String?) {
                 if (!LinkRouter.isCompanionPage(url)) return
                 view.evaluateJavascript(
-                    "window.__whatswebPhone = ${phoneLayout()};\nwindow.__whatswebQuiet = ${quietFrame()};\nwindow.__whatswebHideAi = ${hideAi()};\n${tabLabelScript(view.context)}\n$layout",
+                    scripts.layout(phoneLayout(), quietFrame(), hideAi(), hideCalls = true),
                     null,
                 )
             }
@@ -301,13 +311,6 @@ private fun blockedTelemetry(request: WebResourceRequest): WebResourceResponse? 
         ),
         ByteArrayInputStream(ByteArray(0)),
     )
-}
-
-private fun tabLabelScript(context: Context): String {
-    fun quoted(id: Int) = JSONObject.quote(context.getString(id))
-    return "window.__whatswebTabChats=${quoted(com.synalysis.whatsweb.R.string.tab_chats)};" +
-        "window.__whatswebTabUpdates=${quoted(com.synalysis.whatsweb.R.string.tab_updates)};" +
-        "window.__whatswebTabCalls=${quoted(com.synalysis.whatsweb.R.string.tab_calls)};"
 }
 
 private fun dispatchNavigation(view: WebView, url: String, host: WebHost): Boolean {
