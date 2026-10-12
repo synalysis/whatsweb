@@ -13,9 +13,9 @@ Run `scripts/tag-release` after the version in `app/build.gradle.kts` is committ
 - `WHATSWEB_KEY_ALIAS`
 - `WHATSWEB_KEY_PASSWORD`
 
-That workflow also builds WhatsWeb Calls (`-Pwhatsweb.gecko=true`) and attaches `WhatsWeb-Calls-<version>.apk` to the same release. Both APKs use the `versionName` and `versionCode` in `app/build.gradle.kts`. Calls is a separate application id, `com.synalysis.whatsweb.gecko`, and its release APK contains the arm64 phone build. The debug Calls build still includes the emulator ABI.
+That workflow also builds WhatsWeb Calls (`-Pwhatsweb.gecko=true`) and attaches one APK per CPU: `WhatsWeb-Calls-<version>-arm64-v8a.apk`, `WhatsWeb-Calls-<version>-armeabi-v7a.apk`, and `WhatsWeb-Calls-<version>-x86_64.apk`. Every APK uses the `versionName` and `versionCode` in `app/build.gradle.kts`. Calls is a separate application id, `com.synalysis.whatsweb.gecko`. The debug Calls build stays one install for the emulator and does not include the 32-bit phone ABI.
 
-Obtainium needs an APK filter because the release has two APKs: `^WhatsWeb-[0-9].*\.apk$` for WhatsWeb and `^WhatsWeb-Calls-.*\.apk$` for WhatsWeb Calls.
+Obtainium needs an APK filter because the release has several APKs: `^WhatsWeb-[0-9].*\.apk$` for WhatsWeb and `^WhatsWeb-Calls-.*\.apk$` for WhatsWeb Calls. Calls also needs architecture filtering so Obtainium keeps the file whose name matches the device.
 
 The GitHub APKs and an F-Droid build are signed by different keys, so Android will not replace one with the other. F-Droid builds WhatsWeb only.
 

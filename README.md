@@ -1,7 +1,8 @@
 # WhatsWeb
 
 <a href="https://github.com/synalysis/whatsweb/releases/latest"><img src="docs/badges/download.png" alt="Direct download" height="48"></a>
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22name%22%3A%22WhatsWeb%22%2C%22apkFilterRegEx%22%3A%22%5EWhatsWeb-%5B0-9%5D.%2A%5C%5C.apk%24%22%7D"><img src="docs/badges/obtainium.png" alt="Get WhatsWeb on Obtainium" height="48"></a>
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb%22%2C%22name%22%3A%22WhatsWeb%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22%5EWhatsWeb-%5B0-9%5D.%2A%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D"><img src="docs/badges/obtainium.png" alt="Get WhatsWeb on Obtainium" height="48"></a>
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb.gecko%22%2C%22name%22%3A%22WhatsWeb%20Calls%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22%5EWhatsWeb-Calls-.%2A%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D"><img src="docs/badges/obtainium.png" alt="Get WhatsWeb Calls on Obtainium" height="48"></a>
 
 WhatsWeb is a free Android app that shows the [WhatsApp Web](https://web.whatsapp.com/) companion in a layout meant for a phone. You link it from the WhatsApp app you already use, the same way you would link a desktop browser: **Linked devices → Link a device**, then scan the code.
 
@@ -31,14 +32,15 @@ Install a debug build with `./gradlew installDebug`.
 
 ## Install
 
-Tagged releases include two signed APKs of the same version. Download them from the [releases](https://github.com/synalysis/whatsweb/releases) page:
+Tagged releases on the [releases](https://github.com/synalysis/whatsweb/releases) page include signed APKs of the same version.
 
-- `WhatsWeb-<version>.apk` is WhatsWeb.
-- `WhatsWeb-Calls-<version>.apk` is WhatsWeb Calls, a separate install with voice and video calls, alerts while the app is open, and screen sharing.
+- [WhatsWeb](https://github.com/synalysis/whatsweb/releases/latest): `WhatsWeb-<version>.apk`
+- [WhatsWeb Calls](https://github.com/synalysis/whatsweb/releases/latest), a separate install with voice and video calls, alerts while the app is open, and screen sharing. Download the file that matches the device:
+  - `WhatsWeb-Calls-<version>-arm64-v8a.apk` for current phones
+  - `WhatsWeb-Calls-<version>-armeabi-v7a.apk` for older 32-bit phones
+  - `WhatsWeb-Calls-<version>-x86_64.apk` for Chromebooks and emulators
 
-[Obtainium](https://github.com/ImranR98/Obtainium) can track each one from the same GitHub repository. The WhatsWeb entry uses the APK filter `^WhatsWeb-[0-9].*\.apk$`. The Calls entry uses `^WhatsWeb-Calls-.*\.apk$`.
-
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb.gecko%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22name%22%3A%22WhatsWeb%20Calls%22%2C%22apkFilterRegEx%22%3A%22%5EWhatsWeb-Calls-.%2A%5C%5C.apk%24%22%7D"><img src="docs/badges/obtainium.png" alt="Get WhatsWeb Calls on Obtainium" height="48"></a>
+[Obtainium](https://github.com/ImranR98/Obtainium) can track each app from the same GitHub repository. [Add WhatsWeb](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb%22%2C%22name%22%3A%22WhatsWeb%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22%5EWhatsWeb-%5B0-9%5D.%2A%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Afalse%7D%22%7D). [Add WhatsWeb Calls](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%7B%22id%22%3A%22com.synalysis.whatsweb.gecko%22%2C%22name%22%3A%22WhatsWeb%20Calls%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fsynalysis%2Fwhatsweb%22%2C%22author%22%3A%22synalysis%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22%5EWhatsWeb-Calls-.%2A%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%7D%22%7D). The Calls link turns on architecture filtering, so Obtainium keeps the APK whose name matches the device.
 
 The GitHub APK and an F-Droid build are signed by different keys, so Android will not replace one with the other. WhatsWeb Calls is not an F-Droid build.
 

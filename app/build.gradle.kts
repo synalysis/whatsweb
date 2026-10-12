@@ -48,14 +48,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            if (geckoEngine) {
-                ndk {
-                    // The emulator is x86_64 and a phone is arm64.
-                    abiFilters += listOf("arm64-v8a", "x86_64")
-                }
-            }
-        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -71,11 +63,17 @@ android {
             if (releaseSigningConfigured) {
                 signingConfig = signingConfigs.getByName("release")
             }
-            if (geckoEngine) {
-                ndk {
-                    // Phones only. The debug build still includes the emulator ABI.
-                    abiFilters += "arm64-v8a"
-                }
+        }
+    }
+
+    if (geckoEngine) {
+        // One APK per CPU, same versionCode. Obtainium matches the ABI in the filename.
+        splits {
+            abi {
+                isEnable = true
+                reset()
+                include("armeabi-v7a", "arm64-v8a", "x86_64")
+                isUniversalApk = false
             }
         }
     }

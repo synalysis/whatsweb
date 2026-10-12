@@ -62,7 +62,14 @@ jobs:
           # Same versionName and versionCode. A second install, so the property
           # stays off the F-Droid and Play builds.
           ./gradlew assembleRelease -Pwhatsweb.gecko=true --no-daemon --rerun-tasks
-          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/whatsweb-calls.apk"
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            src="app/build/outputs/apk/release/app-${abi}-release.apk"
+            if [ ! -f "$src" ]; then
+              echo "Missing $src"
+              exit 1
+            fi
+            cp "$src" "$RUNNER_TEMP/whatsweb-calls-${abi}.apk"
+          done
 
       - name: Check tag matches versionName
         run: |
@@ -91,7 +98,24 @@ jobs:
             fi
           }
           check "$RUNNER_TEMP/whatsweb.apk" com.synalysis.whatsweb
-          check "$RUNNER_TEMP/whatsweb-calls.apk" com.synalysis.whatsweb.gecko
+          codes=""
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            apk="$RUNNER_TEMP/whatsweb-calls-${abi}.apk"
+            check "$apk" com.synalysis.whatsweb.gecko
+            badging="$("$aapt" dump badging "$apk")"
+            native="$(printf '%s\n' "$badging" | sed -n "s/native-code: '\([^']*\)'.*/\1/p")"
+            code="$(printf '%s\n' "$badging" | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")"
+            if [ "$native" != "$abi" ]; then
+              echo "$apk native-code '$native' is not $abi"
+              exit 1
+            fi
+            codes="${codes}${code}"$'\n'
+          done
+          uniq_codes="$(printf '%s' "$codes" | sort -u | wc -l)"
+          if [ "$uniq_codes" -ne 1 ]; then
+            echo "Calls APKs do not share one versionCode"
+            exit 1
+          fi
 
       - name: Publish GitHub release
         env:
@@ -101,26 +125,32 @@ jobs:
           tag="$GITHUB_REF_NAME"
           version="${tag#v}"
           apk="WhatsWeb-${version}.apk"
-          calls="WhatsWeb-Calls-${version}.apk"
           cp "$RUNNER_TEMP/whatsweb.apk" "$apk"
-          cp "$RUNNER_TEMP/whatsweb-calls.apk" "$calls"
-          sum_main="$(sha256sum "$apk" | cut -d' ' -f1)"
-          sum_calls="$(sha256sum "$calls" | cut -d' ' -f1)"
+          assets=("$apk")
+          sums="$(printf '%s\n' "- \`${apk}\`: \`$(sha256sum "$apk" | cut -d' ' -f1)\`")"
+          calls_list=""
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            calls="WhatsWeb-Calls-${version}-${abi}.apk"
+            cp "$RUNNER_TEMP/whatsweb-calls-${abi}.apk" "$calls"
+            assets+=("$calls")
+            calls_list="${calls_list}- \`${calls}\`"$'\n'
+            sums="${sums}"$'\n'"- \`${calls}\`: \`$(sha256sum "$calls" | cut -d' ' -f1)\`"
+          done
           notes=$(printf '%s\n' \
-            "Download \`${apk}\` or \`${calls}\` from the assets below. Both are version ${version}." \
+            "Download \`${apk}\` or a WhatsWeb Calls APK from the assets below. All of them are version ${version}." \
             "" \
-            "WhatsWeb Calls is a separate install with voice and video calls, alerts while the app is open, and screen sharing. It can sit beside WhatsWeb." \
+            "WhatsWeb Calls is a separate install with voice and video calls, alerts while the app is open, and screen sharing. Pick the file whose name matches the phone:" \
+            "${calls_list%$'\n'}" \
             "" \
-            "In [Obtainium](https://github.com/ImranR98/Obtainium), add https://github.com/synalysis/whatsweb twice. Give WhatsWeb the APK filter \`^WhatsWeb-[0-9].*\\.apk$\` and WhatsWeb Calls the filter \`^WhatsWeb-Calls-.*\\.apk$\`." \
+            "In [Obtainium](https://github.com/ImranR98/Obtainium), add https://github.com/synalysis/whatsweb twice. Give WhatsWeb the APK filter \`^WhatsWeb-[0-9].*\\.apk$\`. Give WhatsWeb Calls the filter \`^WhatsWeb-Calls-.*\\.apk$\` and turn on architecture filtering so it keeps the matching file." \
             "" \
             "SHA-256:" \
-            "- \`${apk}\`: \`${sum_main}\`" \
-            "- \`${calls}\`: \`${sum_calls}\`" \
+            "$sums" \
             "" \
-            "Both files are signed with the project's release key. An F-Droid package is signed separately, and Android will not replace one with the other.")
+            "These files are signed with the project's release key. An F-Droid package is signed separately, and Android will not replace one with the other.")
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$apk" "$calls" --clobber
+            gh release upload "$tag" "${assets[@]}" --clobber
             gh release edit "$tag" --title "WhatsWeb ${version}" --notes "$notes"
           else
-            gh release create "$tag" "$apk" "$calls" --title "WhatsWeb ${version}" --notes "$notes"
+            gh release create "$tag" "${assets[@]}" --title "WhatsWeb ${version}" --notes "$notes"
           fi
