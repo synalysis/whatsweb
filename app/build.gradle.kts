@@ -26,8 +26,8 @@ android {
         applicationId = "com.synalysis.whatsweb"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.0.5"
         if (geckoEngine) {
             // A separate install so WhatsWeb Calls does not replace the
             // system-WebView packages used for F-Droid, direct download, and Play.
