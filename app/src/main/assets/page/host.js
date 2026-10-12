@@ -52,6 +52,86 @@
     devices.__whatswebPortrait = true;
   }
 
+  // Firefox on a phone lists the microphone and no speakers. WhatsApp Web then
+  // leaves the call muted, because the unmute control has no output to use.
+  // The phone already plays through its own speaker, so offer that as the default.
+  function defaultSpeaker() {
+    var base = window.MediaDeviceInfo && MediaDeviceInfo.prototype;
+    var device = base ? Object.create(base) : {};
+    function prop(name, value) {
+      try {
+        Object.defineProperty(device, name, { value: value, enumerable: true, configurable: true });
+      } catch (error) {
+        device[name] = value;
+      }
+    }
+    prop("deviceId", "default");
+    prop("kind", "audiooutput");
+    prop("label", "Default speaker");
+    prop("groupId", "whatsweb");
+    device.toJSON = function () {
+      return { deviceId: "default", kind: "audiooutput", label: "Default speaker", groupId: "whatsweb" };
+    };
+    return device;
+  }
+
+  function withSpeaker(list) {
+    var found = list || [];
+    for (var i = 0; i < found.length; i++) {
+      if (found[i] && found[i].kind === "audiooutput") return found;
+    }
+    var copy = [];
+    for (var j = 0; j < found.length; j++) copy.push(found[j]);
+    copy.push(defaultSpeaker());
+    return copy;
+  }
+
+  function patchEnumerate(owner) {
+    if (!owner || owner.__whatswebSpeakers || typeof owner.enumerateDevices !== "function") return;
+    var enumerateDevices = owner.enumerateDevices;
+    var wrapped = function () {
+      return Promise.resolve(enumerateDevices.apply(this, arguments)).then(withSpeaker);
+    };
+    try {
+      Object.defineProperty(owner, "enumerateDevices", { value: wrapped, configurable: true, writable: true });
+    } catch (error) {
+      try { owner.enumerateDevices = wrapped; } catch (ignored) { return; }
+    }
+    if (owner.enumerateDevices !== wrapped) return;
+    try {
+      Object.defineProperty(owner, "__whatswebSpeakers", { value: true });
+    } catch (error) {
+      owner.__whatswebSpeakers = true;
+    }
+  }
+
+  patchEnumerate(window.MediaDevices && MediaDevices.prototype);
+  patchEnumerate(navigator.mediaDevices);
+
+  var mediaElement = window.HTMLMediaElement && HTMLMediaElement.prototype;
+  if (mediaElement && !mediaElement.__whatswebSink) {
+    var setSinkId = mediaElement.setSinkId;
+    var assignSink = function (sinkId) {
+      if (typeof setSinkId !== "function") return Promise.resolve();
+      var accepted = sinkId === "default" || sinkId === "";
+      try {
+        return Promise.resolve(setSinkId.call(this, sinkId)).catch(function (error) {
+          if (accepted) return undefined;
+          return Promise.reject(error);
+        });
+      } catch (error) {
+        if (accepted) return Promise.resolve();
+        return Promise.reject(error);
+      }
+    };
+    try {
+      Object.defineProperty(mediaElement, "setSinkId", { value: assignSink, configurable: true, writable: true });
+    } catch (error) {
+      mediaElement.setSinkId = assignSink;
+    }
+    mediaElement.__whatswebSink = true;
+  }
+
   window.WhatswebHost = {
     postMessage: function (payload) {
       window.postMessage({ whatsweb: "host", payload: String(payload) }, window.location.origin);

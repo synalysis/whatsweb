@@ -12,6 +12,7 @@ import com.synalysis.whatsweb.ui.AppState
 import com.synalysis.whatsweb.ui.WebSlot
 import org.json.JSONObject
 import org.mozilla.geckoview.AllowOrDeny
+import org.mozilla.geckoview.GeckoPreferenceController
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoRuntimeSettings
@@ -490,6 +491,16 @@ private fun runtime(context: Context): GeckoRuntime {
     EngineProfiles.profileArguments(context)?.let { builder.arguments(it) }
     val settings = builder.build()
     return GeckoRuntime.create(context, settings).also { created ->
+        // Ask Firefox to list real speakers. Android often still returns none;
+        // the page then supplies the phone's default output.
+        try {
+            GeckoPreferenceController.setGeckoPref(
+                "media.setsinkid.enabled",
+                true,
+                GeckoPreferenceController.PREF_BRANCH_USER,
+            )
+        } catch (_: Throwable) {
+        }
         val notifications = CompanionNotifications(context)
         NotificationBridge.notifications = notifications
         created.webNotificationDelegate = notifications
