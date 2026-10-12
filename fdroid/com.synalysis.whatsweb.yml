@@ -21,9 +21,9 @@ RepoType: git
 Repo: https://github.com/synalysis/whatsweb.git
 
 Builds:
-  - versionName: 1.1.0
-    versionCode: 9
-    commit: v1.1.0
+  - versionName: 1.1.1
+    versionCode: 10
+    commit: v1.1.1
     gradle:
       - yes
     scandelete:
@@ -31,5 +31,5 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.1.0
-CurrentVersionCode: 9
+CurrentVersion: 1.1.1
+CurrentVersionCode: 10
