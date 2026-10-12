@@ -10,6 +10,7 @@ class SessionBridge(
             is HostMessages.Message.Pane -> {
                 if (message.pane == "list" || message.pane == "chat") state.pane = message.pane
             }
+            is HostMessages.Message.Cover -> state.infoOpen = message.open
             is HostMessages.Message.Session -> state.linked = message.linked
             else -> Unit
         }

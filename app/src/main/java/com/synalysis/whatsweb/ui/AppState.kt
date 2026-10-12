@@ -12,6 +12,7 @@ import java.util.WeakHashMap
 
 class AppState {
     var pane by mutableStateOf("list")
+    var infoOpen by mutableStateOf(false)
     var linked by mutableStateOf<Boolean?>(null)
     var progress by mutableIntStateOf(0)
     var pageTitle by mutableStateOf<String?>(null)

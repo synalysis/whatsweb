@@ -130,12 +130,16 @@
     "  background: #d8fdd2;",
     "}",
     "#whatsweb-tabbar [data-whatsweb-tab-label] {",
-    "  position: relative;",
-    "  z-index: 1;",
-    "  margin-top: -16px;",
+    "  position: absolute;",
+    "  left: 0;",
+    "  right: 0;",
+    "  bottom: 8px;",
+    "  z-index: 2;",
+    "  margin: 0;",
     "  font-size: 12px;",
     "  line-height: 14px;",
     "  font-weight: 500;",
+    "  text-align: center;",
     "  color: rgba(0, 0, 0, 0.6);",
     "  pointer-events: none;",
     "}",
@@ -161,6 +165,7 @@
     "  align-items: center;",
     "  gap: 16px;",
     "  z-index: 2;",
+    "  pointer-events: none;",
     "}",
     "#whatsweb-tabbar [data-whatsweb-slot='fabs']::before {",
     "  content: none;",
@@ -180,13 +185,25 @@
     "  z-index: 1;",
     "}",
     "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs']) button {",
-    "  width: 88px !important;",
-    "  height: 56px !important;",
+    "  position: absolute !important;",
+    "  left: 0 !important;",
+    "  top: 0 !important;",
+    "  right: 0 !important;",
+    "  bottom: 0 !important;",
+    "  width: auto !important;",
+    "  height: auto !important;",
     "  display: flex !important;",
-    "  align-items: flex-start !important;",
-    "  justify-content: center !important;",
-    "  padding-top: 2px !important;",
+    "  flex-direction: column !important;",
+    "  align-items: center !important;",
+    "  justify-content: flex-start !important;",
+    "  padding: 10px 0 0 !important;",
     "  background: transparent !important;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs']) button :not(svg):not(path):not(title):not(:has(svg)) {",
+    "  display: none !important;",
+    "}",
+    "#whatsweb-tabbar [data-whatsweb-slot='fabs'] button {",
+    "  pointer-events: auto;",
     "}",
     "#whatsweb-tabbar [data-whatsweb-slot]:not([data-whatsweb-slot='fabs']) button::after {",
     "  content: none !important;",
@@ -738,21 +755,121 @@
     if (bar) bar.style.visibility = "";
   }
 
-  function fitOverlay() {
-    var drawer = document.querySelector("[data-testid='new-chat-drawer']");
-    var box = drawer && drawer.getBoundingClientRect();
-    if (!drawer || !box || box.height < 80) {
-      clearOverlay();
-      return;
-    }
-    var left = document.querySelector("[data-testid='drawer-left']");
+  function markDrawer(drawer, stop) {
     var el = drawer;
     while (el) {
       el.dataset.whatswebDrawer = "1";
-      if (el === left) break;
+      if (!el.parentElement || el === stop) break;
       el = el.parentElement;
     }
-    document.documentElement.dataset.whatswebDrawer = "1";
+  }
+
+  function visibleDrawer(testid) {
+    var drawer = document.querySelector("[data-testid='" + testid + "']");
+    var box = drawer && drawer.getBoundingClientRect();
+    if (!drawer || !box || box.width < 40 || box.height < 80) return null;
+    return drawer;
+  }
+
+  function closeInfoDrawer() {
+    var drawer = visibleDrawer("drawer-right");
+    if (!drawer) return false;
+    var buttons = drawer.querySelectorAll("button, [role='button']");
+    var target = null;
+    for (var i = 0; i < buttons.length; i++) {
+      var button = buttons[i];
+      var icon = iconName(button);
+      var label = (button.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().toLowerCase();
+      var closes = controlKind(button) === "back" || label === "close" || icon === "ic-close" || icon === "ic-arrow-back";
+      if (!closes) continue;
+      var box = button.getBoundingClientRect();
+      if (box.width < 8 || box.top > 80) continue;
+      if (!target || box.top < target.getBoundingClientRect().top) target = button;
+    }
+    if (!target) return false;
+    target.click();
+    return true;
+  }
+
+  // A name or photo in the group chat opens that person on top of group info.
+  // Closing the person would otherwise reveal a group page the user never asked for.
+  var dismissPersonInfo = false;
+  var sawContactInfo = false;
+  var personObserver = null;
+
+  function personInChat(target) {
+    if (!target || !target.closest) return false;
+    var hit = target.closest("[data-testid='author'], [data-testid='group-chat-profile-picture']");
+    if (!hit) return false;
+    var chat = document.querySelector("[data-whatsweb-role='chat']");
+    return !!(chat && chat.contains(hit));
+  }
+
+  function drawerCloseButton(drawer) {
+    var buttons = drawer.querySelectorAll("button, [role='button']");
+    var target = null;
+    for (var i = 0; i < buttons.length; i++) {
+      var button = buttons[i];
+      var icon = iconName(button);
+      var label = (button.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().toLowerCase();
+      if (icon !== "ic-close" && label !== "close") continue;
+      var box = button.getBoundingClientRect();
+      if (box.width < 8 || box.top > 80) continue;
+      if (!target || box.top < target.getBoundingClientRect().top) target = button;
+    }
+    return target;
+  }
+
+  function disarmPersonInfo() {
+    dismissPersonInfo = false;
+    sawContactInfo = false;
+    if (personObserver) {
+      personObserver.disconnect();
+      personObserver = null;
+    }
+  }
+
+  function settlePersonInfo() {
+    if (!dismissPersonInfo) return;
+    var drawer = visibleDrawer("drawer-right");
+    if (!drawer) {
+      disarmPersonInfo();
+      return;
+    }
+    var contact = drawer.querySelector("[data-testid='contact-info-header']");
+    var group = drawer.querySelector("[data-testid='group-info-header']");
+    if (contact) sawContactInfo = true;
+    if (group && !contact && !sawContactInfo) {
+      disarmPersonInfo();
+      return;
+    }
+    if (!sawContactInfo || !group) return;
+    var close = drawerCloseButton(drawer);
+    if (!close) return;
+    disarmPersonInfo();
+    close.click();
+  }
+
+  function armPersonInfo() {
+    if (dismissPersonInfo) return;
+    dismissPersonInfo = true;
+    sawContactInfo = false;
+    personObserver = new MutationObserver(settlePersonInfo);
+    personObserver.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  function fitOverlay() {
+    settlePersonInfo();
+    clearOverlay();
+    var chat = visibleDrawer("new-chat-drawer");
+    if (chat) markDrawer(chat, document.querySelector("[data-testid='drawer-left']"));
+    var info = visibleDrawer("chat-info-drawer");
+    var right = document.querySelector("[data-testid='drawer-right']");
+    if (info && right && right.contains(info)) markDrawer(info, right);
+    if (chat || (info && right && right.contains(info))) {
+      document.documentElement.dataset.whatswebDrawer = "1";
+    }
+    reportCover(!!(info && right && right.contains(info)));
   }
 
   function labelTab(bar, name, text) {
@@ -765,6 +882,7 @@
       slot.appendChild(label);
     }
     if (label.textContent !== text) label.textContent = text;
+    if (label.parentNode !== slot || slot.lastElementChild !== label) slot.appendChild(label);
     var button = slot.querySelector("button, [role='button']");
     var selected = button && button.getAttribute("data-navbar-item-selected") === "true";
     if (selected) slot.dataset.whatswebSelected = "1";
@@ -901,6 +1019,14 @@
   }
 
   var reportedPane = "";
+  var reportedCover = false;
+  function reportCover(open) {
+    open = !!open;
+    if (open === reportedCover) return;
+    reportedCover = open;
+    postHost({ type: "cover", open: open });
+  }
+
   function reportPane() {
     var pane = window.__whatswebPhone && document.documentElement.dataset.pane === "chat" ? "chat" : "list";
     if (pane === reportedPane) return;
@@ -1260,6 +1386,7 @@
     if (!found) {
       if (document.getElementById("pane-side")) {
         reportSession();
+        reportCover(false);
         return;
       }
       clearBottomNav();
@@ -1270,6 +1397,7 @@
       alignLoginTop();
       reportSession();
       reportPane();
+      reportCover(false);
       return;
     }
     clearLoginFit();
@@ -1285,6 +1413,7 @@
       fitOverlay();
       watchPage();
     } else clearOverlay();
+    if (!window.__whatswebPhone) reportCover(false);
   }
 
   function revealChat() {
@@ -1324,6 +1453,10 @@
 
   document.addEventListener("click", function (event) {
     if (!window.__whatswebPhone) return;
+    if (personInChat(event.target) && !visibleDrawer("drawer-right")) armPersonInfo();
+    window.setTimeout(function () {
+      if (window.__whatswebPhone) fitOverlay();
+    }, 300);
     var target = event.target;
     if (!target || !target.closest) return;
     var list = document.querySelector("[data-whatsweb-role='list']");
@@ -1363,6 +1496,7 @@
   window.whatswebBack = function () {
     if (!window.__whatswebPhone) return false;
     delete document.documentElement.dataset.opening;
+    if (closeInfoDrawer()) return true;
     if (document.documentElement.dataset.pane === "chat") {
       document.documentElement.dataset.pane = "list";
       layoutPanes();

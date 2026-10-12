@@ -3,6 +3,7 @@ package com.synalysis.whatsweb.web
 internal object HostMessages {
     sealed interface Message {
         data class Pane(val pane: String) : Message
+        data class Cover(val open: Boolean) : Message
         data class Session(val linked: Boolean) : Message
         data class Chunk(
             val id: String,
@@ -18,6 +19,11 @@ internal object HostMessages {
         val fields = FlatJson.fields(raw) ?: return null
         return when (fields["type"]) {
             "pane" -> fields["pane"]?.let { Message.Pane(it) }
+            "cover" -> when (fields["open"]) {
+                "true" -> Message.Cover(true)
+                "false" -> Message.Cover(false)
+                else -> null
+            }
             "session" -> when (fields["linked"]) {
                 "true" -> Message.Session(true)
                 "false" -> Message.Session(false)

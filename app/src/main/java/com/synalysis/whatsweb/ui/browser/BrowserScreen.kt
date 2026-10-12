@@ -233,7 +233,7 @@ fun BrowserScreen(
                             },
                         )
                     }
-                    if (prefs.phoneLayout && state.pane == "chat") {
+                    if (prefs.phoneLayout && state.pane == "chat" && !state.infoOpen) {
                         IconButton(
                             onClick = {
                                 webSlot.view?.evaluateJavascript("window.whatswebBack()", null)

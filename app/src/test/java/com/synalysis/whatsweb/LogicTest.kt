@@ -178,6 +178,10 @@ class HostMessagesTest {
             HostMessages.Message.Pane("chat"),
             HostMessages.parse("""{"type":"pane","pane":"chat"}"""),
         )
+        assertEquals(
+            HostMessages.Message.Cover(true),
+            HostMessages.parse("""{"type":"cover","open":true}"""),
+        )
         assertEquals(HostMessages.Message.Session(false), HostMessages.parse("""{"type":"session","linked":false}"""))
         assertEquals(HostMessages.Message.Fail, HostMessages.parse("""{"type":"fail"}"""))
         assertEquals(
