@@ -8,6 +8,7 @@ internal object HostMessages {
         data class Cover(val open: Boolean) : Message
         data class Session(val linked: Boolean) : Message
         data class Self(val phone: String) : Message
+        data class Call(val active: Boolean) : Message
         data class Chunk(
             val id: String,
             val index: Int,
@@ -39,6 +40,11 @@ internal object HostMessages {
                     PHONE.matches(phone) -> Message.Self(phone)
                     else -> null
                 }
+            }
+            "call" -> when (fields["active"]) {
+                "true" -> Message.Call(true)
+                "false" -> Message.Call(false)
+                else -> null
             }
             "fail" -> Message.Fail
             "chunk" -> {

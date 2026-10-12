@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.synalysis.whatsweb.prefs.AccountRestart
@@ -71,7 +73,7 @@ class MainActivity : AppCompatActivity() {
 
     private val lockObserver = object : DefaultLifecycleObserver {
         override fun onStop(owner: LifecycleOwner) {
-            if (prefs.appLock && prefs.welcomeDone) locked = true
+            if (prefs.appLock && prefs.welcomeDone && !state.onCall) locked = true
         }
     }
 
@@ -131,6 +133,17 @@ class MainActivity : AppCompatActivity() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(lockObserver)
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
+            LaunchedEffect(state.onCall) {
+                if (state.onCall) {
+                    locked = false
+                } else if (
+                    prefs.appLock &&
+                    prefs.welcomeDone &&
+                    !this@MainActivity.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                ) {
+                    locked = true
+                }
+            }
             WhatswebTheme(dynamicColor = prefs.dynamicColor) {
                 WhatswebApp(
                     prefs = prefs,

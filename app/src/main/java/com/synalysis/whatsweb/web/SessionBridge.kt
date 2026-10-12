@@ -13,6 +13,7 @@ class SessionBridge(
             is HostMessages.Message.Cover -> state.infoOpen = message.open
             is HostMessages.Message.Session -> state.linked = message.linked
             is HostMessages.Message.Self -> state.selfPhone = message.phone
+            is HostMessages.Message.Call -> state.onCall = message.active
             else -> Unit
         }
     }

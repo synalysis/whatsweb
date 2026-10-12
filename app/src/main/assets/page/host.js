@@ -138,6 +138,54 @@
     }
   };
 
+  // A live call, including one whose window is tucked away, should keep the
+  // app lock from covering the page when the phone is switched away and back.
+  var rtcLive = 0;
+  var domCall = false;
+  var lastCall = null;
+  function publishCall() {
+    var active = rtcLive > 0 || domCall;
+    if (active === lastCall) return;
+    lastCall = active;
+    var host = window.WhatswebHost;
+    if (!host || !host.postMessage) return;
+    host.postMessage(JSON.stringify({ type: "call", active: active }));
+  }
+
+  window.__whatswebSetDomCall = function (active) {
+    domCall = !!active;
+    publishCall();
+  };
+
+  var OrigPeer = window.RTCPeerConnection;
+  if (OrigPeer && !OrigPeer.__whatswebCall) {
+    function Peer(config) {
+      var pc = new OrigPeer(config);
+      rtcLive += 1;
+      publishCall();
+      var counted = true;
+      pc.addEventListener("connectionstatechange", function () {
+        var state = pc.connectionState;
+        if (!counted || (state !== "closed" && state !== "failed")) return;
+        counted = false;
+        rtcLive -= 1;
+        if (rtcLive < 0) rtcLive = 0;
+        publishCall();
+      });
+      return pc;
+    }
+    Peer.prototype = OrigPeer.prototype;
+    if (typeof OrigPeer.generateCertificate === "function") {
+      Peer.generateCertificate = function () {
+        return OrigPeer.generateCertificate.apply(OrigPeer, arguments);
+      };
+    }
+    try {
+      Object.defineProperty(Peer, "__whatswebCall", { value: true });
+    } catch (error) {}
+    window.RTCPeerConnection = Peer;
+  }
+
   window.addEventListener("message", function (event) {
     if (event.source !== window || !event.data || event.data.whatsweb !== "call") return;
     var data = event.data;

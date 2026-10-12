@@ -1541,6 +1541,29 @@
     }
   }
 
+  function buttonVisible(button) {
+    if (!button || (button.closest && button.closest("#whatsweb-tabbar"))) return null;
+    var rect = button.getBoundingClientRect();
+    if (rect.width < 8 || rect.height < 8 || rect.bottom < 0 || rect.top > window.innerHeight) return null;
+    return rect;
+  }
+
+  function isEndCall(button) {
+    var icon = iconName(button);
+    var label = (button.getAttribute("aria-label") || "").toLowerCase();
+    if (icon.indexOf("call-end") !== -1 || icon.indexOf("end-call") !== -1 || icon.indexOf("hangup") !== -1 || icon.indexOf("phone-down") !== -1) return true;
+    if (label.indexOf("hang up") !== -1 || label.indexOf("end call") !== -1) return true;
+    return false;
+  }
+
+  function isCallMic(button) {
+    var icon = iconName(button);
+    var label = (button.getAttribute("aria-label") || "").toLowerCase();
+    var mic = icon.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 || label.indexOf("microphone") !== -1;
+    if (!mic || !button.parentElement) return false;
+    return !!button.parentElement.querySelector("[aria-haspopup]");
+  }
+
   function callOnScreen() {
     var videos = document.querySelectorAll("video");
     for (var i = 0; i < videos.length; i++) {
@@ -1550,21 +1573,22 @@
     var buttons = document.querySelectorAll("button, [role='button']");
     for (var b = 0; b < buttons.length; b++) {
       var button = buttons[b];
-      if (button.closest && button.closest("#whatsweb-tabbar")) continue;
+      var rect = buttonVisible(button);
+      if (!rect) continue;
+      if (isEndCall(button) || isCallMic(button)) return true;
       var icon = iconName(button);
       var label = (button.getAttribute("aria-label") || "").toLowerCase();
       var mic = icon.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 || label.indexOf("microphone") !== -1;
-      if (!mic) continue;
-      var rect = button.getBoundingClientRect();
-      if (rect.width < 8 || rect.top < window.innerHeight * 0.45) continue;
-      return true;
+      if (mic && rect.top >= window.innerHeight * 0.45) return true;
     }
     return false;
   }
 
   function placeCallChrome() {
-    if (callOnScreen()) document.documentElement.dataset.whatswebCall = "1";
+    var active = callOnScreen();
+    if (active) document.documentElement.dataset.whatswebCall = "1";
     else delete document.documentElement.dataset.whatswebCall;
+    if (window.__whatswebSetDomCall) window.__whatswebSetDomCall(active);
   }
 
   function apply() {

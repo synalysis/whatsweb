@@ -185,6 +185,8 @@ class HostMessagesTest {
         assertEquals(HostMessages.Message.Session(false), HostMessages.parse("""{"type":"session","linked":false}"""))
         assertEquals(HostMessages.Message.Self("15551234567"), HostMessages.parse("""{"type":"self","phone":"15551234567"}"""))
         assertEquals(HostMessages.Message.Self(""), HostMessages.parse("""{"type":"self","phone":""}"""))
+        assertEquals(HostMessages.Message.Call(true), HostMessages.parse("""{"type":"call","active":true}"""))
+        assertEquals(HostMessages.Message.Call(false), HostMessages.parse("""{"type":"call","active":false}"""))
         assertEquals(HostMessages.Message.Fail, HostMessages.parse("""{"type":"fail"}"""))
         assertEquals(
             HostMessages.Message.Chunk("abc", 1, 2, "image/png", "YQ=="),
