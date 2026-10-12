@@ -65,6 +65,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            if (geckoEngine) {
+                proguardFile("proguard-rules-gecko.pro")
+            }
             // Unsigned unless every release signing variable is set. F-Droid
             // signs that APK itself; CI uses the project keystore.
             if (releaseSigningConfigured) {
