@@ -1,11 +1,6 @@
-// Android WebView never becomes cross-origin isolated, so SharedArrayBuffer is missing
-// and WhatsApp disables the chat call menu. The constructor only has to exist for that
-// check; calling itself still needs the real buffer, which WebView cannot provide.
-if (typeof SharedArrayBuffer !== "function") {
-  window.SharedArrayBuffer = function SharedArrayBuffer(length) {
-    return new ArrayBuffer(length >>> 0);
-  };
-}
+// Leave SharedArrayBuffer absent. A stand-in makes WhatsApp try to start a call,
+// then disable the voice and video buttons with an error. WebView cannot provide
+// the real buffer those calls need.
 (function () {
   var version = "__CHROME_VERSION__";
   var major = version.split(".")[0];

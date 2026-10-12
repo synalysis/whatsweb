@@ -37,6 +37,9 @@
     "  min-width: 0 !important;",
     "  width: 100% !important;",
     "}",
+    "[data-testid='conversation-header'] [data-whatsweb-hide-call] {",
+    "  display: none !important;",
+    "}",
     "html[data-whatsweb='phone'] [data-testid='chatlist-header'][data-whatsweb-nav] {",
     "  position: absolute !important;",
     "  width: 0 !important;",
@@ -1137,6 +1140,20 @@
     if (banner) banner.style.display = "none";
   }
 
+  function hideChatCalls() {
+    var previous = document.querySelectorAll("[data-whatsweb-hide-call]");
+    for (var i = 0; i < previous.length; i++) delete previous[i].dataset.whatswebHideCall;
+    var header = document.querySelector("[data-testid='conversation-header']");
+    if (!header) return;
+    var buttons = header.querySelectorAll("button, [role='button']");
+    for (var b = 0; b < buttons.length; b++) {
+      var icon = iconName(buttons[b]);
+      if (icon === "ic-call" || icon === "ic-call-filled" || icon === "ic-videocam" || icon === "ic-videocam-filled") {
+        buttons[b].dataset.whatswebHideCall = "1";
+      }
+    }
+  }
+
   function placeBackRoom() {
     var marked = document.querySelectorAll("[data-whatsweb-back-room]");
     for (var i = 0; i < marked.length; i++) delete marked[i].dataset.whatswebBackRoom;
@@ -1381,6 +1398,7 @@
     placeStatusHeader();
     placeEdgeHeaders();
     hideNavTips();
+    hideChatCalls();
     placeBackRoom();
     var found = companionPanes();
     if (!found) {
