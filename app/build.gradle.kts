@@ -2,7 +2,6 @@ import org.gradle.api.GradleException
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
@@ -104,10 +103,10 @@ android {
 
     sourceSets.named("main") {
         if (geckoEngine) {
-            java.srcDir("src/engineGecko/java")
-            res.srcDir("src/engineGecko/res")
+            kotlin.directories.add("src/engineGecko/java")
+            res.directories.add("src/engineGecko/res")
         } else {
-            java.srcDir("src/engineWebview/java")
+            kotlin.directories.add("src/engineWebview/java")
         }
     }
 }
@@ -117,12 +116,6 @@ if (geckoEngine) {
         onVariants { variant ->
             variant.sources.manifests.addStaticManifestFile("src/engineGecko/AndroidManifest.xml")
         }
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
