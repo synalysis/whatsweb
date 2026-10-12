@@ -65,6 +65,8 @@ private class WebViewCompanionPage(
 
     override fun resume() {
         web.onResume()
+        web.resumeTimers()
+        web.post { web.requestLayout() }
     }
 
     override fun pause() {

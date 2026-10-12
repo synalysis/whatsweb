@@ -85,7 +85,9 @@ fun WhatswebApp(
     Box(Modifier.fillMaxSize()) {
     if (!prefs.welcomeDone) {
         WelcomeScreen(onContinue = prefs::completeWelcome)
-    } else if (!locked) {
+    } else {
+        // Stay composed while locked. Removing the page and attaching it again
+        // after a successful unlock can leave the web view white.
         BrowserScreen(
             prefs = prefs,
             state = state,

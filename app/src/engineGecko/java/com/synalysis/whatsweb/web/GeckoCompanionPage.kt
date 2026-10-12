@@ -343,6 +343,7 @@ private class GeckoCompanionPage(
 
     override fun resume() {
         session.setActive(true)
+        geckoView.post { geckoView.requestLayout() }
     }
 
     override fun pause() {
