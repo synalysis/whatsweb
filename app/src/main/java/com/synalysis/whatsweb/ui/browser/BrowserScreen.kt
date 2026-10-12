@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.material.icons.Icons
@@ -255,9 +256,16 @@ fun BrowserScreen(
                     onClick = onOpenSettings,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 8.dp, end = 4.dp),
+                        .padding(
+                            top = (8f + (prefs.textZoom - 100) * 0.33f).dp,
+                            end = 4.dp,
+                        ),
                 ) {
-                    Icon(Icons.Filled.Settings, stringResource(R.string.cd_settings))
+                    Icon(
+                        Icons.Filled.Settings,
+                        stringResource(R.string.cd_settings),
+                        modifier = Modifier.size((24f * prefs.textZoom / 100f).dp),
+                    )
                 }
             }
         }
