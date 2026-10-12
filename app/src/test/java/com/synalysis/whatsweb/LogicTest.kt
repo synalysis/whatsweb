@@ -183,6 +183,8 @@ class HostMessagesTest {
             HostMessages.parse("""{"type":"cover","open":true}"""),
         )
         assertEquals(HostMessages.Message.Session(false), HostMessages.parse("""{"type":"session","linked":false}"""))
+        assertEquals(HostMessages.Message.Self("15551234567"), HostMessages.parse("""{"type":"self","phone":"15551234567"}"""))
+        assertEquals(HostMessages.Message.Self(""), HostMessages.parse("""{"type":"self","phone":""}"""))
         assertEquals(HostMessages.Message.Fail, HostMessages.parse("""{"type":"fail"}"""))
         assertEquals(
             HostMessages.Message.Chunk("abc", 1, 2, "image/png", "YQ=="),
@@ -194,6 +196,8 @@ class HostMessagesTest {
     fun rejectsMalformedMessages() {
         assertNull(HostMessages.parse("""{"type":"pane","pane":"chat","pane":"list"}"""))
         assertNull(HostMessages.parse("""{"type":"session","linked":{"nested":true}}"""))
+        assertNull(HostMessages.parse("""{"type":"self","phone":"12"}"""))
+        assertNull(HostMessages.parse("""{"type":"self"}"""))
         assertNull(HostMessages.parse("{\"type\":\"pane\",\"pane\":\"line\nbreak\"}"))
         assertEquals(
             HostMessages.Message.Pane("a\"b"),

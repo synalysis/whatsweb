@@ -1193,13 +1193,50 @@
   }
 
   var lastLinked = null;
+  var lastPhone = null;
+  function phoneFromWid(raw) {
+    if (!raw) return null;
+    var text = String(raw).replace(/^"+|"+$/g, "");
+    var at = text.indexOf("@");
+    if (at <= 0) return null;
+    var host = text.slice(at);
+    if (host !== "@c.us" && host !== "@s.whatsapp.net") return null;
+    var user = text.slice(0, at);
+    var colon = user.indexOf(":");
+    var digits = colon > 0 ? user.slice(0, colon) : user;
+    if (!/^[0-9]{8,15}$/.test(digits)) return null;
+    return digits;
+  }
+
+  function ownNumber() {
+    var keys = ["last-wid-md", "last-wid"];
+    for (var i = 0; i < keys.length; i++) {
+      var raw = null;
+      try { raw = localStorage.getItem(keys[i]); } catch (e) { raw = null; }
+      var phone = phoneFromWid(raw);
+      if (phone) return phone;
+    }
+    return null;
+  }
+
+  function reportOwnNumber() {
+    if (lastLinked !== true) return;
+    var phone = ownNumber();
+    if (!phone || phone === lastPhone) return;
+    lastPhone = phone;
+    postHost({ type: "self", phone: phone });
+  }
+
   function reportSession() {
     var linked = null;
     if (document.getElementById("pane-side")) linked = true;
     else if (document.querySelector("[data-testid='wa-logo']") || document.querySelector("#app canvas")) linked = false;
-    if (linked === null || linked === lastLinked) return;
-    lastLinked = linked;
-    postHost({ type: "session", linked: linked });
+    if (linked === null) return;
+    if (linked !== lastLinked) {
+      lastLinked = linked;
+      postHost({ type: "session", linked: linked });
+    }
+    if (linked === true) reportOwnNumber();
   }
 
   function hideDownloadBanner() {

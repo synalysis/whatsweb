@@ -302,19 +302,23 @@ private fun MessagePane(
     }
 }
 
-internal fun clearWebViewSession(view: WebView?) {
+internal fun clearWebViewSession(view: WebView?, onDone: (() -> Unit)? = null) {
     val main = Handler(Looper.getMainLooper())
     CookieManager.getInstance().removeAllCookies {
         main.post {
             CookieManager.getInstance().flush()
             WebStorage.getInstance().deleteAllData()
-            if (view == null) return@post
-            try {
-                view.clearCache(true)
-                view.clearHistory()
-                view.loadUrl(LinkRouter.HOME)
-            } catch (_: Exception) {
+            if (view != null) {
+                try {
+                    view.clearCache(true)
+                    view.clearHistory()
+                    // A restart follows onDone. Loading home here can recreate the
+                    // profile directory after the next process has deleted it.
+                    if (onDone == null) view.loadUrl(LinkRouter.HOME)
+                } catch (_: Exception) {
+                }
             }
+            onDone?.invoke()
         }
     }
 }

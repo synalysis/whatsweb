@@ -2,7 +2,10 @@ package com.synalysis.whatsweb.web
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.webkit.CookieManager
 import android.webkit.WebView
 import com.synalysis.whatsweb.ui.AppState
 import com.synalysis.whatsweb.ui.WebSlot
@@ -81,8 +84,26 @@ private class WebViewCompanionPage(
         return web.restoreState(saved) != null
     }
 
-    override fun clearData() {
-        clearWebViewSession(web)
+    override fun clearData(onDone: (() -> Unit)?) {
+        clearWebViewSession(web, onDone)
+    }
+
+    override fun prepareToExit(onDone: () -> Unit) {
+        val main = Handler(Looper.getMainLooper())
+        try {
+            web.onPause()
+            web.pauseTimers()
+        } catch (_: Throwable) {
+        }
+        try {
+            CookieManager.getInstance().flush()
+        } catch (_: Throwable) {
+        }
+        try {
+            slot.destroy(web)
+        } catch (_: Throwable) {
+        }
+        main.post(onDone)
     }
 
     override fun destroy() {

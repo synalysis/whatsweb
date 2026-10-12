@@ -20,6 +20,7 @@ interface CompanionPage {
     fun pause()
     fun saveState(out: Bundle)
     fun restoreState(saved: Bundle): Boolean
-    fun clearData()
+    fun clearData(onDone: (() -> Unit)? = null)
+    fun prepareToExit(onDone: () -> Unit)
     fun destroy()
 }

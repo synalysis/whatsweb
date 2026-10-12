@@ -16,6 +16,7 @@ class AppState {
     var pane by mutableStateOf("list")
     var infoOpen by mutableStateOf(false)
     var linked by mutableStateOf<Boolean?>(null)
+    var selfPhone by mutableStateOf<String?>(null)
     var progress by mutableIntStateOf(0)
     var pageTitle by mutableStateOf<String?>(null)
     var mainFrameError by mutableStateOf(false)

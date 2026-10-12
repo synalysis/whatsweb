@@ -374,10 +374,34 @@ private class GeckoCompanionPage(
 
     override fun restoreState(saved: Bundle): Boolean = false
 
-    override fun clearData() {
-        runtime.storageController.clearData(StorageController.ClearFlags.ALL).accept {
-            loadUrl(LinkRouter.HOME)
+    override fun prepareToExit(onDone: () -> Unit) {
+        try {
+            session.setActive(false)
+            session.flushSessionState()
+        } catch (_: Throwable) {
         }
+        main.post {
+            try {
+                session.close()
+            } catch (_: Throwable) {
+            }
+            // shutdown() force-quits Gecko and can drop the flush just requested.
+            main.post(onDone)
+        }
+    }
+
+    override fun clearData(onDone: (() -> Unit)?) {
+        runtime.storageController.clearData(StorageController.ClearFlags.ALL).accept(
+            {
+                main.post {
+                    if (onDone == null) loadUrl(LinkRouter.HOME)
+                    onDone?.invoke()
+                }
+            },
+            {
+                main.post { onDone?.invoke() }
+            },
+        )
     }
 
     override fun destroy() {
@@ -459,11 +483,12 @@ private var runtimeRef: GeckoRuntime? = null
 
 private fun runtime(context: Context): GeckoRuntime {
     runtimeRef?.let { return it }
-    val settings = GeckoRuntimeSettings.Builder()
+    val builder = GeckoRuntimeSettings.Builder()
         .javaScriptEnabled(true)
         .fissionEnabled(true)
         .consoleOutput(false)
-        .build()
+    EngineProfiles.profileArguments(context)?.let { builder.arguments(it) }
+    val settings = builder.build()
     return GeckoRuntime.create(context, settings).also { created ->
         val notifications = CompanionNotifications(context)
         NotificationBridge.notifications = notifications

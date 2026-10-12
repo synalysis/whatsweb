@@ -1,10 +1,13 @@
 package com.synalysis.whatsweb.web
 
 internal object HostMessages {
+    private val PHONE = Regex("^[0-9]{8,15}$")
+
     sealed interface Message {
         data class Pane(val pane: String) : Message
         data class Cover(val open: Boolean) : Message
         data class Session(val linked: Boolean) : Message
+        data class Self(val phone: String) : Message
         data class Chunk(
             val id: String,
             val index: Int,
@@ -28,6 +31,14 @@ internal object HostMessages {
                 "true" -> Message.Session(true)
                 "false" -> Message.Session(false)
                 else -> null
+            }
+            "self" -> {
+                val phone = fields["phone"] ?: return null
+                when {
+                    phone.isEmpty() -> Message.Self("")
+                    PHONE.matches(phone) -> Message.Self(phone)
+                    else -> null
+                }
             }
             "fail" -> Message.Fail
             "chunk" -> {

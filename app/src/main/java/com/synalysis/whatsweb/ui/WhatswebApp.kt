@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.synalysis.whatsweb.R
+import com.synalysis.whatsweb.prefs.CompanionAccounts
 import com.synalysis.whatsweb.prefs.ThemeMode
 import com.synalysis.whatsweb.prefs.UserPreferences
 import com.synalysis.whatsweb.ui.browser.BrowserScreen
@@ -49,6 +50,8 @@ import com.synalysis.whatsweb.web.WebHost
 @Composable
 fun WhatswebApp(
     prefs: UserPreferences,
+    accounts: CompanionAccounts,
+    canAddAccount: Boolean,
     state: AppState,
     webSlot: WebSlot,
     host: WebHost,
@@ -58,6 +61,11 @@ fun WhatswebApp(
     onUnlock: () -> Unit,
     onLeave: () -> Unit,
     onTheme: (ThemeMode) -> Unit,
+    onOpenAccount: (String) -> Unit,
+    onAddAccount: (String) -> Unit,
+    onRenameAccount: (String) -> Unit,
+    onRemoveAccount: () -> Unit,
+    onAccountLimit: () -> Unit,
     onClearSession: () -> Unit,
     canUseLock: () -> Boolean,
 ) {
@@ -66,6 +74,13 @@ fun WhatswebApp(
     var showSettings by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(locked) {
         if (locked) showSettings = false
+    }
+    LaunchedEffect(state.linked) {
+        if (state.linked == false) accounts.noteLoggedOut()
+    }
+    LaunchedEffect(state.selfPhone) {
+        val phone = state.selfPhone ?: return@LaunchedEffect
+        if (phone.isNotEmpty()) accounts.rememberPhone(phone)
     }
 
     SideEffect {
@@ -108,12 +123,28 @@ fun WhatswebApp(
         ) {
             SettingsSheet(
                 prefs = prefs,
+                accounts = accounts,
+                canAddAccount = canAddAccount,
                 onTheme = onTheme,
                 onReload = {
                     showSettings = false
                     state.mainFrameError = false
                     webSlot.page?.reload()
                 },
+                onOpenAccount = { id ->
+                    showSettings = false
+                    onOpenAccount(id)
+                },
+                onAddAccount = { name ->
+                    showSettings = false
+                    onAddAccount(name)
+                },
+                onRenameAccount = onRenameAccount,
+                onRemoveAccount = {
+                    showSettings = false
+                    onRemoveAccount()
+                },
+                onAccountLimit = onAccountLimit,
                 onClearSession = {
                     showSettings = false
                     onClearSession()

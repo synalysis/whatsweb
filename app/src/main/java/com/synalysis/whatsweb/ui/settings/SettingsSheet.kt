@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -26,19 +28,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.synalysis.whatsweb.BuildConfig
 import com.synalysis.whatsweb.R
+import com.synalysis.whatsweb.prefs.CompanionAccounts
+import com.synalysis.whatsweb.prefs.LinkRecords
 import com.synalysis.whatsweb.prefs.ThemeMode
 import com.synalysis.whatsweb.prefs.UserPreferences
 
 @Composable
 fun SettingsSheet(
     prefs: UserPreferences,
+    accounts: CompanionAccounts,
+    canAddAccount: Boolean,
     onTheme: (ThemeMode) -> Unit,
     onReload: () -> Unit,
+    onOpenAccount: (String) -> Unit,
+    onAddAccount: (String) -> Unit,
+    onRenameAccount: (String) -> Unit,
+    onRemoveAccount: () -> Unit,
+    onAccountLimit: () -> Unit,
     onClearSession: () -> Unit,
     onLockRejected: () -> Unit,
     canUseLock: () -> Boolean,
 ) {
     var confirmClear by rememberSaveable { mutableStateOf(false) }
+    var confirmRemove by rememberSaveable { mutableStateOf(false) }
+    var nameDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    var draft by rememberSaveable { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,6 +64,68 @@ fun SettingsSheet(
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )
+        Text(
+            text = stringResource(R.string.links_heading),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        Text(
+            text = stringResource(R.string.links_hint),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        accounts.items.forEach { account ->
+            val selected = account.id == accounts.activeId
+            val phone = accounts.phoneText(account)
+            ListItem(
+                headlineContent = { Text(accounts.label(account)) },
+                supportingContent = phone?.let { number -> { Text(number) } },
+                modifier = Modifier.clickable {
+                    if (!selected) onOpenAccount(account.id)
+                },
+                trailingContent = {
+                    RadioButton(
+                        selected = selected,
+                        onClick = { if (!selected) onOpenAccount(account.id) },
+                    )
+                },
+            )
+        }
+        if (canAddAccount) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.link_add)) },
+                modifier = Modifier.clickable {
+                    if (accounts.items.size >= LinkRecords.MAX) {
+                        onAccountLimit()
+                    } else {
+                        draft = ""
+                        nameDialog = "add"
+                    }
+                },
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.link_needs_android),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.link_rename)) },
+            modifier = Modifier.clickable {
+                draft = accounts.label(accounts.active)
+                nameDialog = "rename"
+            },
+        )
+        if (accounts.items.size > 1) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.link_remove)) },
+                modifier = Modifier.clickable { confirmRemove = true },
+            )
+        }
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
         ListItem(
             headlineContent = { Text(stringResource(R.string.cd_reload)) },
             modifier = Modifier.clickable(onClick = onReload),
@@ -185,6 +261,72 @@ fun SettingsSheet(
                 modifier = Modifier.padding(top = 8.dp),
             )
         }
+    }
+
+    if (nameDialog != null) {
+        val adding = nameDialog == "add"
+        AlertDialog(
+            onDismissRequest = { nameDialog = null },
+            title = {
+                Text(stringResource(if (adding) R.string.link_add_title else R.string.link_rename_title))
+            },
+            text = {
+                Column {
+                    if (adding) {
+                        Text(stringResource(R.string.link_add_body))
+                    }
+                    OutlinedTextField(
+                        value = draft,
+                        onValueChange = { draft = it.take(40) },
+                        singleLine = true,
+                        label = { Text(stringResource(R.string.link_name)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = if (adding) 12.dp else 0.dp),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val name = draft
+                        nameDialog = null
+                        if (adding) onAddAccount(name) else onRenameAccount(name)
+                    },
+                    enabled = draft.isNotBlank(),
+                ) {
+                    Text(stringResource(if (adding) R.string.link_add_confirm else R.string.link_rename_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { nameDialog = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    if (confirmRemove) {
+        AlertDialog(
+            onDismissRequest = { confirmRemove = false },
+            title = { Text(stringResource(R.string.link_remove_title)) },
+            text = { Text(stringResource(R.string.link_remove_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmRemove = false
+                        onRemoveAccount()
+                    },
+                ) {
+                    Text(stringResource(R.string.link_remove_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRemove = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 
     if (confirmClear) {

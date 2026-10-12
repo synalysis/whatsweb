@@ -37,12 +37,16 @@ import androidx.core.content.IntentCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.synalysis.whatsweb.prefs.AccountRestart
+import com.synalysis.whatsweb.prefs.CompanionAccounts
+import com.synalysis.whatsweb.prefs.LinkRecords
 import com.synalysis.whatsweb.prefs.ThemeMode
 import com.synalysis.whatsweb.prefs.UserPreferences
 import com.synalysis.whatsweb.ui.AppState
 import com.synalysis.whatsweb.ui.WebSlot
 import com.synalysis.whatsweb.ui.WhatswebApp
 import com.synalysis.whatsweb.ui.theme.WhatswebTheme
+import com.synalysis.whatsweb.web.EngineProfiles
 import com.synalysis.whatsweb.web.LinkRouter
 import com.synalysis.whatsweb.web.MediaStoreSaver
 import com.synalysis.whatsweb.web.WebHost
@@ -52,6 +56,7 @@ import java.util.concurrent.RejectedExecutionException
 
 class MainActivity : AppCompatActivity() {
     private val prefs by lazy { UserPreferences(this) }
+    private val accounts by lazy { CompanionAccounts(this) }
     private val state = AppState()
     private val webSlot = WebSlot()
     private var locked by mutableStateOf(false)
@@ -101,7 +106,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var host: WebHost
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Choose the browser profile before AppCompat or the page can create a WebView.
+        val ready = prepareAccount(intent)
         super.onCreate(savedInstanceState)
+        if (!ready) return
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
@@ -126,6 +134,8 @@ class MainActivity : AppCompatActivity() {
             WhatswebTheme(dynamicColor = prefs.dynamicColor) {
                 WhatswebApp(
                     prefs = prefs,
+                    accounts = accounts,
+                    canAddAccount = EngineProfiles.canSeparate(),
                     state = state,
                     webSlot = webSlot,
                     host = host,
@@ -143,7 +153,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     },
                     onTheme = ::changeTheme,
+                    onOpenAccount = ::openAccount,
+                    onAddAccount = ::addAccount,
+                    onRenameAccount = accounts::renameActive,
+                    onRemoveAccount = ::removeAccount,
+                    onAccountLimit = { state.notice = getString(R.string.link_limit) },
                     onClearSession = {
+                        accounts.discardPhoneUntilLogout(state.linked == true)
+                        state.selfPhone = null
                         state.linked = null
                         state.pane = "list"
                         state.pageTitle = null
@@ -158,6 +175,14 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        val requested = intent.getStringExtra(AccountRestart.EXTRA)
+        if (requested != null && accounts.find(requested) != null && requested != EngineProfiles.installed) {
+            if (!switchable(requested)) return
+            accounts.holdProfileWrites()
+            accounts.setActive(requested)
+            restart()
+            return
+        }
         consumeIntent(intent)
     }
 
@@ -195,6 +220,74 @@ class MainActivity : AppCompatActivity() {
         }
         io.shutdown()
         super.onDestroy()
+    }
+
+    private fun prepareAccount(intent: Intent?): Boolean {
+        val requested = intent?.getStringExtra(AccountRestart.EXTRA)
+        if (requested != null && accounts.find(requested) != null &&
+            (EngineProfiles.canSeparate() || requested == LinkRecords.MAIN)
+        ) {
+            accounts.setActive(requested)
+        }
+        val installed = EngineProfiles.installed
+        if (installed != null && installed != accounts.activeId) {
+            restart()
+            return false
+        }
+        accounts.pendingRemoval()?.let { id ->
+            if (EngineProfiles.delete(this, id)) accounts.completeRemoval(id)
+        }
+        if (!EngineProfiles.canSeparate() && accounts.activeId != LinkRecords.MAIN && accounts.find(LinkRecords.MAIN) != null) {
+            accounts.setActive(LinkRecords.MAIN)
+        }
+        EngineProfiles.install(this, accounts.activeId)
+        if (EngineProfiles.installed == null) EngineProfiles.install(this, LinkRecords.MAIN)
+        accounts.publishShortcuts()
+        return true
+    }
+
+    private fun openAccount(id: String) {
+        if (id == accounts.activeId || !switchable(id)) return
+        accounts.holdProfileWrites()
+        accounts.setActive(id)
+        restart()
+    }
+
+    private fun addAccount(name: String) {
+        accounts.holdProfileWrites()
+        if (accounts.add(name) == null) {
+            accounts.releaseProfileWrites()
+            state.notice = getString(R.string.link_limit)
+            return
+        }
+        restart()
+    }
+
+    private fun removeAccount() {
+        accounts.holdProfileWrites()
+        if (!accounts.removeActive()) {
+            accounts.releaseProfileWrites()
+            return
+        }
+        val page = webSlot.page
+        if (page == null) {
+            restart()
+        } else {
+            page.clearData { restart() }
+        }
+    }
+
+    private fun switchable(id: String): Boolean {
+        if (EngineProfiles.canSeparate() || id == LinkRecords.MAIN) return true
+        state.notice = getString(R.string.link_needs_android)
+        return false
+    }
+
+    private fun restart() {
+        AccountRestart.rebirth(this) { done ->
+            val page = webSlot.page
+            if (page == null) done() else page.prepareToExit(done)
+        }
     }
 
     private fun changeTheme(mode: ThemeMode) {

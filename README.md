@@ -17,6 +17,7 @@ The page you see is the official companion site. WhatsWeb does not speak WhatsAp
 - Optional app lock, using this device's own biometric or PIN prompt.
 - An option to blank the recent-apps preview and block screenshots.
 - Optional handling of `wa.me`, `api.whatsapp.com`, and group invite links. This stays off until you turn it on.
+- More than one WhatsApp account. Each account keeps its own linked session. Switching reloads the app into that session. A long-press on the icon opens an account once two or more are saved. Android limits how many of those shortcuts it shows; the rest stay in settings.
 
 There is no account, no advertising, and no analytics. Background push is not included, because that would mean running WhatsApp's proprietary push service. See [PRIVACY.md](PRIVACY.md).
 
