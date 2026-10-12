@@ -2,6 +2,7 @@ package com.synalysis.whatsweb.web
 
 import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -149,6 +150,25 @@ private class GeckoCompanionPage(
 
             override fun onCrash(session: GeckoSession) {
                 state.rendererGone = true
+            }
+        }
+        session.mediaDelegate = object : GeckoSession.MediaDelegate {
+            override fun onRecordingStatusChanged(
+                session: GeckoSession,
+                devices: Array<GeckoSession.MediaDelegate.RecordingDevice>,
+            ) {
+                val microphone = devices.any {
+                    it.type == GeckoSession.MediaDelegate.RecordingDevice.Type.MICROPHONE &&
+                        it.status == GeckoSession.MediaDelegate.RecordingDevice.Status.RECORDING
+                }
+                val audio = app.getSystemService(AudioManager::class.java) ?: return
+                audio.mode = if (microphone) {
+                    AudioManager.MODE_IN_COMMUNICATION
+                } else if (audio.mode == AudioManager.MODE_IN_COMMUNICATION) {
+                    AudioManager.MODE_NORMAL
+                } else {
+                    audio.mode
+                }
             }
         }
         session.permissionDelegate = object : GeckoSession.PermissionDelegate {

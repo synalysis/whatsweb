@@ -273,8 +273,12 @@
     "  margin: 0 !important;",
     "  z-index: 1100 !important;",
     "}",
-    "html[data-whatsweb='phone'][data-whatsweb-drawer='1'] #whatsweb-tabbar {",
+    "html[data-whatsweb='phone'][data-whatsweb-drawer='1'] #whatsweb-tabbar,",
+    "html[data-whatsweb-call='1'] #whatsweb-tabbar {",
     "  display: none !important;",
+    "}",
+    "html[data-whatsweb-call='1'] video {",
+    "  pointer-events: none !important;",
     "}",
     "html[data-whatsweb='phone'] [role='dialog'] {",
     "  box-sizing: border-box !important;",
@@ -1500,8 +1504,35 @@
     }
   }
 
+  function callOnScreen() {
+    var videos = document.querySelectorAll("video");
+    for (var i = 0; i < videos.length; i++) {
+      var box = videos[i].getBoundingClientRect();
+      if (box.width > window.innerWidth * 0.7 && box.height > window.innerHeight * 0.4) return true;
+    }
+    var buttons = document.querySelectorAll("button, [role='button']");
+    for (var b = 0; b < buttons.length; b++) {
+      var button = buttons[b];
+      if (button.closest && button.closest("#whatsweb-tabbar")) continue;
+      var icon = iconName(button);
+      var label = (button.getAttribute("aria-label") || "").toLowerCase();
+      var mic = icon.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 || label.indexOf("microphone") !== -1;
+      if (!mic) continue;
+      var rect = button.getBoundingClientRect();
+      if (rect.width < 8 || rect.top < window.innerHeight * 0.45) continue;
+      return true;
+    }
+    return false;
+  }
+
+  function placeCallChrome() {
+    if (callOnScreen()) document.documentElement.dataset.whatswebCall = "1";
+    else delete document.documentElement.dataset.whatswebCall;
+  }
+
   function apply() {
     fitDialogs();
+    placeCallChrome();
     hideDownloadBanner();
     placeQuietRoom();
     placeStatusHeader();
