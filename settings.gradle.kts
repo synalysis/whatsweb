@@ -6,8 +6,7 @@ pluginManagement {
     }
 }
 
-val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true" ||
-    startParameter.projectProperties["whatsweb.gecko"] == "true"
+val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

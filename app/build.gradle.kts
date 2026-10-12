@@ -5,14 +5,13 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val releaseKeystore = System.getenv("WHATSWEB_KEYSTORE")
-val releaseStorePassword = System.getenv("WHATSWEB_KEYSTORE_PASSWORD")
-val releaseKeyAlias = System.getenv("WHATSWEB_KEY_ALIAS")
-val releaseKeyPassword = System.getenv("WHATSWEB_KEY_PASSWORD")
+val releaseKeystore = providers.environmentVariable("WHATSWEB_KEYSTORE").orNull
+val releaseStorePassword = providers.environmentVariable("WHATSWEB_KEYSTORE_PASSWORD").orNull
+val releaseKeyAlias = providers.environmentVariable("WHATSWEB_KEY_ALIAS").orNull
+val releaseKeyPassword = providers.environmentVariable("WHATSWEB_KEY_PASSWORD").orNull
 val releaseSigningValues = listOf(releaseKeystore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword)
 val releaseSigningConfigured = releaseSigningValues.all { !it.isNullOrBlank() }
-val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true" ||
-    gradle.startParameter.projectProperties["whatsweb.gecko"] == "true"
+val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true"
 if (releaseSigningValues.any { !it.isNullOrBlank() } && !releaseSigningConfigured) {
     throw GradleException(
         "Release signing requires WHATSWEB_KEYSTORE, WHATSWEB_KEYSTORE_PASSWORD, WHATSWEB_KEY_ALIAS, and WHATSWEB_KEY_PASSWORD.",
