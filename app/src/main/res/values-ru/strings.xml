@@ -68,6 +68,8 @@
     <string name="about_license">Лицензия GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Независимо от WhatsApp. Сама страница — официальный компаньон WhatsApp Web.</string>
     <string name="about_notifications">Фоновые уведомления недоступны. Это приложение не запускает push-службу WhatsApp.</string>
+    <string name="screen_share_active">Ты показываешь свой экран</string>
+    <string name="screen_share_stop">Остановить</string>
 
     <string name="lock_title">Разблокировать WhatsWeb</string>
     <string name="lock_subtitle">Подтверди, что это ты, чтобы показать компаньон.</string>

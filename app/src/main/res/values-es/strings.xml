@@ -68,6 +68,8 @@
     <string name="about_license">Licencia GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Independiente de WhatsApp. La página en sí es el compañero oficial de WhatsApp Web.</string>
     <string name="about_notifications">Las alertas en segundo plano no están disponibles. Esta app no ejecuta el servicio de notificaciones de WhatsApp.</string>
+    <string name="screen_share_active">Compartiendo tu pantalla</string>
+    <string name="screen_share_stop">Detener</string>
 
     <string name="lock_title">Desbloquear WhatsWeb</string>
     <string name="lock_subtitle">Confirma que eres tú para mostrar el compañero.</string>

@@ -68,6 +68,8 @@
     <string name="about_license">Dilisensikan di bawah GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Terpisah dari WhatsApp. Halaman itu sendiri adalah pendamping resmi WhatsApp Web.</string>
     <string name="about_notifications">Peringatan di latar belakang tidak tersedia. Aplikasi ini tidak menjalankan layanan push WhatsApp.</string>
+    <string name="screen_share_active">Kamu sedang berbagi layar</string>
+    <string name="screen_share_stop">Berhenti</string>
 
     <string name="lock_title">Buka kunci WhatsWeb</string>
     <string name="lock_subtitle">Konfirmasikan bahwa ini Anda untuk menampilkan pendamping.</string>

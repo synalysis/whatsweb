@@ -68,6 +68,8 @@
     <string name="about_license">以 GPL-3.0-or-later 授权。</string>
     <string name="about_disclaimer">独立于 WhatsApp。页面本身是官方的 WhatsApp 网页版。</string>
     <string name="about_notifications">没有后台提醒。此应用不运行 WhatsApp 的推送服务。</string>
+    <string name="screen_share_active">正在共享你的屏幕</string>
+    <string name="screen_share_stop">停止</string>
 
     <string name="lock_title">解锁 WhatsWeb</string>
     <string name="lock_subtitle">确认是你本人后才会显示伙伴。</string>

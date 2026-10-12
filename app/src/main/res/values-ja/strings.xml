@@ -68,6 +68,8 @@
     <string name="about_license">GPL-3.0-or-later でライセンスされています。</string>
     <string name="about_disclaimer">WhatsApp とは独立しています。ページそのものは公式の WhatsApp Web です。</string>
     <string name="about_notifications">バックグラウンド通知はありません。このアプリは WhatsApp のプッシュサービスを実行しません。</string>
+    <string name="screen_share_active">画面を共有しています</string>
+    <string name="screen_share_stop">停止</string>
 
     <string name="lock_title">WhatsWeb のロックを解除</string>
     <string name="lock_subtitle">本人確認後に相棒を表示します。</string>

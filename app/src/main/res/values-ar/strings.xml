@@ -68,6 +68,8 @@
     <string name="about_license">مرخّص بموجب GPL-3.0-or-later.</string>
     <string name="about_disclaimer">مستقل عن واتساب. الصفحة نفسها هي رفيق واتساب ويب الرسمي.</string>
     <string name="about_notifications">التنبيهات في الخلفية غير متاحة. هذا التطبيق لا يشغّل خدمة الدفع من واتساب.</string>
+    <string name="screen_share_active">تتم مشاركة شاشتك</string>
+    <string name="screen_share_stop">إيقاف</string>
 
     <string name="lock_title">فتح قفل WhatsWeb</string>
     <string name="lock_subtitle">أكّد أنك أنت لعرض الرفيق.</string>
