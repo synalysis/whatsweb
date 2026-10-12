@@ -43,19 +43,101 @@
     return Object.assign({}, constraints, { video: next });
   }
 
-  var devices = navigator.mediaDevices;
-  if (devices && !devices.__whatswebPortrait && typeof devices.getUserMedia === "function") {
-    var getUserMedia = devices.getUserMedia.bind(devices);
-    devices.getUserMedia = function (constraints) {
-      return getUserMedia(portraitVideo(constraints));
-    };
-    devices.__whatswebPortrait = true;
+  // Firefox on a phone names the real mic and speaker, then leaves their ids
+  // blank. WhatsApp ignores a blank id, so the unmute half of the call button
+  // returns without opening the microphone. Call that device "default", and
+  // drop that stand-in id before capture so Firefox still opens the real mic.
+  function listedIds(value) {
+    var ids = [];
+    function add(item) {
+      if (typeof item === "string") ids.push(item);
+      else if (item && typeof item.length === "number") {
+        for (var i = 0; i < item.length; i++) if (typeof item[i] === "string") ids.push(item[i]);
+      }
+    }
+    if (typeof value === "string" || (value && typeof value.length === "number")) add(value);
+    else if (value && typeof value === "object") {
+      add(value.exact);
+      add(value.ideal);
+    }
+    return ids;
   }
 
-  // Firefox on a phone lists the microphone and no speakers. WhatsApp Web then
-  // leaves the call muted, because the unmute control has no output to use.
-  // The phone already plays through its own speaker, so offer that as the default.
-  function defaultSpeaker() {
+  function withoutDefaultMic(audio) {
+    if (!audio || audio === true || typeof audio !== "object") return audio;
+    var ids = listedIds(audio.deviceId);
+    if (!ids.length) return audio;
+    for (var i = 0; i < ids.length; i++) if (ids[i] !== "default") return audio;
+    var cleaned = {};
+    var kept = false;
+    for (var key in audio) {
+      if (key === "deviceId" || !Object.prototype.hasOwnProperty.call(audio, key)) continue;
+      cleaned[key] = audio[key];
+      kept = true;
+    }
+    return kept ? cleaned : true;
+  }
+
+  function prepareConstraints(constraints) {
+    var next = portraitVideo(constraints);
+    if (!next || !next.audio) return next;
+    var audio = withoutDefaultMic(next.audio);
+    if (audio === next.audio) return next;
+    var copy = {};
+    for (var key in next) {
+      if (Object.prototype.hasOwnProperty.call(next, key)) copy[key] = next[key];
+    }
+    copy.audio = audio;
+    return copy;
+  }
+
+  function requestMedia(getUserMedia, self, constraints, retried) {
+    var prepared = retried ? constraints : prepareConstraints(constraints);
+    return Promise.resolve(getUserMedia.call(self, prepared)).catch(function (error) {
+      if (retried || !prepared || !prepared.audio || typeof prepared.audio !== "object") {
+        return Promise.reject(error);
+      }
+      var constraint = error && error.constraint;
+      var named = constraint === "deviceId" || constraint === "groupId";
+      var unnamed = !constraint && (prepared.audio.deviceId || prepared.audio.groupId);
+      if (!named && !unnamed) return Promise.reject(error);
+      var audio = {};
+      var kept = false;
+      for (var key in prepared.audio) {
+        if (key === "deviceId" || key === "groupId" || !Object.prototype.hasOwnProperty.call(prepared.audio, key)) continue;
+        audio[key] = prepared.audio[key];
+        kept = true;
+      }
+      var retry = {};
+      for (var name in prepared) {
+        if (Object.prototype.hasOwnProperty.call(prepared, name)) retry[name] = prepared[name];
+      }
+      retry.audio = kept ? audio : true;
+      return requestMedia(getUserMedia, self, retry, true);
+    });
+  }
+
+  function patchGetUserMedia(owner) {
+    if (!owner || typeof owner.getUserMedia !== "function" || owner.getUserMedia.__whatswebGum) return;
+    var getUserMedia = owner.getUserMedia;
+    var wrapped = function (constraints) {
+      return requestMedia(getUserMedia, this, constraints, false);
+    };
+    wrapped.__whatswebGum = true;
+    try {
+      Object.defineProperty(owner, "getUserMedia", { value: wrapped, configurable: true, writable: true });
+    } catch (error) {
+      try { owner.getUserMedia = wrapped; } catch (ignored) { return; }
+    }
+  }
+
+  patchGetUserMedia(window.MediaDevices && MediaDevices.prototype);
+  patchGetUserMedia(navigator.mediaDevices);
+
+  // Firefox on a phone lists the microphone and no speakers until speaker
+  // selection is switched on, and even then the ids are blank. Offer the
+  // phone's own speaker when none is listed, and give a blank id a name.
+  function audioDevice(kind, deviceId, label, groupId) {
     var base = window.MediaDeviceInfo && MediaDeviceInfo.prototype;
     var device = base ? Object.create(base) : {};
     function prop(name, value) {
@@ -65,24 +147,29 @@
         device[name] = value;
       }
     }
-    prop("deviceId", "default");
-    prop("kind", "audiooutput");
-    prop("label", "Default speaker");
-    prop("groupId", "whatsweb");
+    prop("deviceId", deviceId);
+    prop("kind", kind);
+    prop("label", label || "");
+    prop("groupId", groupId || "");
     device.toJSON = function () {
-      return { deviceId: "default", kind: "audiooutput", label: "Default speaker", groupId: "whatsweb" };
+      return { deviceId: deviceId, kind: kind, label: label || "", groupId: groupId || "" };
     };
     return device;
   }
 
   function withSpeaker(list) {
     var found = list || [];
-    for (var i = 0; i < found.length; i++) {
-      if (found[i] && found[i].kind === "audiooutput") return found;
-    }
     var copy = [];
-    for (var j = 0; j < found.length; j++) copy.push(found[j]);
-    copy.push(defaultSpeaker());
+    var sawOutput = false;
+    for (var i = 0; i < found.length; i++) {
+      var device = found[i];
+      if (device && (device.kind === "audioinput" || device.kind === "audiooutput") && !device.deviceId) {
+        device = audioDevice(device.kind, "default", device.label, device.groupId);
+      }
+      if (device && device.kind === "audiooutput") sawOutput = true;
+      copy.push(device);
+    }
+    if (!sawOutput) copy.push(audioDevice("audiooutput", "default", "Default speaker", "whatsweb"));
     return copy;
   }
 
@@ -185,6 +272,54 @@
     } catch (error) {}
     window.RTCPeerConnection = Peer;
   }
+
+  // A finger on the mute half produces a touch, and WhatsApp's toggle listens
+  // for a click. If that click never arrives, send one. A click that did
+  // arrive cancels this, so a working toggle still runs once.
+  var micTap = 0;
+  function callMicButton(target) {
+    if (!target || !target.closest) return null;
+    if (target.closest("[aria-haspopup]")) return null;
+    var button = target.closest("button, [role='button']");
+    if (!button || button.closest("#whatsweb-tabbar")) return null;
+    if (button.closest("[role='menu'], [role='listbox']")) return null;
+    var parent = button.parentElement;
+    if (!parent || !parent.querySelector("[aria-haspopup]")) return null;
+    var icon = button.querySelector("[data-icon]");
+    var name = (icon && icon.getAttribute("data-icon") || "").toLowerCase();
+    var label = (button.getAttribute("aria-label") || "").toLowerCase();
+    var titled = button.querySelector("svg title");
+    var title = titled && titled.textContent ? titled.textContent.toLowerCase() : "";
+    var mic = name.indexOf("mic") !== -1 || label.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 ||
+      title.indexOf("mic") !== -1 || title.indexOf("mute") !== -1;
+    return mic ? button : null;
+  }
+  document.addEventListener("pointercancel", function () {
+    micTap += 1;
+  }, true);
+  document.addEventListener("pointerup", function (event) {
+    if (!event || event.pointerType === "mouse") return;
+    var button = callMicButton(event.target);
+    if (!button || button.disabled || button.getAttribute("aria-disabled") === "true") return;
+    var token = micTap + 1;
+    micTap = token;
+    window.setTimeout(function () {
+      if (micTap !== token) return;
+      micTap += 1;
+      button.dispatchEvent(new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        detail: 1,
+        button: 0,
+        clientX: event.clientX,
+        clientY: event.clientY,
+      }));
+    }, 280);
+  }, true);
+  document.addEventListener("click", function (event) {
+    if (callMicButton(event.target)) micTap += 1;
+  }, false);
 
   window.addEventListener("message", function (event) {
     if (event.source !== window || !event.data || event.data.whatsweb !== "call") return;
