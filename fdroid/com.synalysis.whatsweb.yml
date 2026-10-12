@@ -26,6 +26,8 @@ Builds:
     commit: v1.0.5
     gradle:
       - yes
+    scandelete:
+      - gradle/gecko.repositories.gradle.kts
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags

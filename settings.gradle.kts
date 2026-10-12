@@ -6,19 +6,17 @@ pluginManagement {
     }
 }
 
-val geckoEngine = providers.gradleProperty("whatsweb.gecko").orNull == "true"
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        if (geckoEngine) {
-            maven {
-                url = uri("https://maven.mozilla.org/maven2/")
-            }
-        }
     }
+}
+
+val geckoRepos = file("gradle/gecko.repositories.gradle.kts")
+if (providers.gradleProperty("whatsweb.gecko").orNull == "true" && geckoRepos.isFile) {
+    apply(from = geckoRepos)
 }
 
 rootProject.name = "whatsweb"
