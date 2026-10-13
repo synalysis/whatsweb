@@ -2,6 +2,9 @@
   if (window.__whatswebHostInstalled) return;
   window.__whatswebHostInstalled = true;
 
+  var micAllowed = false;
+  var camAllowed = false;
+
   // WhatsApp Web asks a desktop camera for a landscape frame. On a portrait
   // phone that comes out sideways. Ask for the tall frame instead.
   function longEdge(value) {
@@ -43,10 +46,9 @@
     return Object.assign({}, constraints, { video: next });
   }
 
-  // Firefox on a phone names the real mic and speaker, then leaves their ids
-  // blank. WhatsApp ignores a blank id, so the unmute half of the call button
-  // returns without opening the microphone. Call that device "default", and
-  // drop that stand-in id before capture so Firefox still opens the real mic.
+  // Firefox on a phone lists the microphone and speaker with blank ids.
+  // Give a blank id the name "default", and drop that stand-in before capture
+  // so Firefox still opens the real microphone.
   function listedIds(value) {
     var ids = [];
     function add(item) {
@@ -93,7 +95,13 @@
 
   function requestMedia(getUserMedia, self, constraints, retried) {
     var prepared = retried ? constraints : prepareConstraints(constraints);
-    return Promise.resolve(getUserMedia.call(self, prepared)).catch(function (error) {
+    return Promise.resolve(getUserMedia.call(self, prepared)).then(function (stream) {
+      var audioTracks = stream && stream.getAudioTracks ? stream.getAudioTracks() : [];
+      var videoTracks = stream && stream.getVideoTracks ? stream.getVideoTracks() : [];
+      if (audioTracks.length) micAllowed = true;
+      if (videoTracks.length) camAllowed = true;
+      return stream;
+    }).catch(function (error) {
       if (retried || !prepared || !prepared.audio || typeof prepared.audio !== "object") {
         return Promise.reject(error);
       }
@@ -117,6 +125,40 @@
     });
   }
 
+  // After a capture succeeds, Firefox on Android still answers the permission
+  // query with "prompt". WhatsApp treats that as a failed unmute and leaves
+  // the call muted. Report granted once this page has opened that device.
+  function patchPermissionQuery(owner) {
+    if (!owner || owner.__whatswebPerm || typeof owner.query !== "function") return;
+    var query = owner.query;
+    function wrapped(desc) {
+      var name = desc && desc.name;
+      var allow = (name === "microphone" && micAllowed) || (name === "camera" && camAllowed);
+      return Promise.resolve(query.apply(this, arguments)).then(function (status) {
+        var raw = status && status.state;
+        if (!allow || !status || raw === "granted" || raw === "denied") return status;
+        return new Proxy(status, {
+          get: function (target, prop) {
+            if (prop === "state") return "granted";
+            var value = target[prop];
+            return typeof value === "function" ? value.bind(target) : value;
+          }
+        });
+      }, function (error) {
+        if (!allow) return Promise.reject(error);
+        return { state: "granted", onchange: null };
+      });
+    }
+    try {
+      Object.defineProperty(owner, "query", { value: wrapped, configurable: true, writable: true });
+    } catch (error) {
+      try { owner.query = wrapped; } catch (ignored) { return; }
+    }
+    try { Object.defineProperty(owner, "__whatswebPerm", { value: true }); } catch (error) {}
+  }
+  if (window.Permissions) patchPermissionQuery(Permissions.prototype);
+  if (navigator.permissions) patchPermissionQuery(navigator.permissions);
+
   function patchGetUserMedia(owner) {
     if (!owner || typeof owner.getUserMedia !== "function" || owner.getUserMedia.__whatswebGum) return;
     var getUserMedia = owner.getUserMedia;
@@ -133,6 +175,29 @@
 
   patchGetUserMedia(window.MediaDevices && MediaDevices.prototype);
   patchGetUserMedia(navigator.mediaDevices);
+
+  function patchTrackSettings() {
+    var proto = window.MediaStreamTrack && MediaStreamTrack.prototype;
+    if (!proto || proto.__whatswebSettings || typeof proto.getSettings !== "function") return;
+    var getSettings = proto.getSettings;
+    var wrapped = function () {
+      var settings = getSettings.call(this) || {};
+      if (this.kind !== "audio" || settings.deviceId) return settings;
+      var copy = {};
+      for (var key in settings) {
+        if (Object.prototype.hasOwnProperty.call(settings, key)) copy[key] = settings[key];
+      }
+      copy.deviceId = "default";
+      return copy;
+    };
+    try {
+      Object.defineProperty(proto, "getSettings", { value: wrapped, configurable: true, writable: true });
+    } catch (error) {
+      try { proto.getSettings = wrapped; } catch (ignored) { return; }
+    }
+    proto.__whatswebSettings = true;
+  }
+  patchTrackSettings();
 
   // Firefox on a phone lists the microphone and no speakers until speaker
   // selection is switched on, and even then the ids are blank. Offer the
@@ -221,17 +286,17 @@
 
   window.WhatswebHost = {
     postMessage: function (payload) {
-      window.postMessage({ whatsweb: "host", payload: String(payload) }, window.location.origin);
+      var message = { whatsweb: "host", payload: String(payload) };
+      window.postMessage(message, window.location.origin);
     }
   };
 
-  // A live call, including one whose window is tucked away, should keep the
-  // app lock from covering the page when the phone is switched away and back.
-  var rtcLive = 0;
+  // The call screen is the signal. Page peer connections stay open in the
+  // chat list and are not the call, so counting them leaves the controls up.
   var domCall = false;
   var lastCall = null;
   function publishCall() {
-    var active = rtcLive > 0 || domCall;
+    var active = domCall;
     if (active === lastCall) return;
     lastCall = active;
     var host = window.WhatswebHost;
@@ -244,85 +309,9 @@
     publishCall();
   };
 
-  var OrigPeer = window.RTCPeerConnection;
-  if (OrigPeer && !OrigPeer.__whatswebCall) {
-    function Peer(config) {
-      var pc = new OrigPeer(config);
-      rtcLive += 1;
-      publishCall();
-      var counted = true;
-      pc.addEventListener("connectionstatechange", function () {
-        var state = pc.connectionState;
-        if (!counted || (state !== "closed" && state !== "failed")) return;
-        counted = false;
-        rtcLive -= 1;
-        if (rtcLive < 0) rtcLive = 0;
-        publishCall();
-      });
-      return pc;
-    }
-    Peer.prototype = OrigPeer.prototype;
-    if (typeof OrigPeer.generateCertificate === "function") {
-      Peer.generateCertificate = function () {
-        return OrigPeer.generateCertificate.apply(OrigPeer, arguments);
-      };
-    }
-    try {
-      Object.defineProperty(Peer, "__whatswebCall", { value: true });
-    } catch (error) {}
-    window.RTCPeerConnection = Peer;
-  }
-
-  // A finger on the mute half produces a touch, and WhatsApp's toggle listens
-  // for a click. If that click never arrives, send one. A click that did
-  // arrive cancels this, so a working toggle still runs once.
-  var micTap = 0;
-  function callMicButton(target) {
-    if (!target || !target.closest) return null;
-    if (target.closest("[aria-haspopup]")) return null;
-    var button = target.closest("button, [role='button']");
-    if (!button || button.closest("#whatsweb-tabbar")) return null;
-    if (button.closest("[role='menu'], [role='listbox']")) return null;
-    var parent = button.parentElement;
-    if (!parent || !parent.querySelector("[aria-haspopup]")) return null;
-    var icon = button.querySelector("[data-icon]");
-    var name = (icon && icon.getAttribute("data-icon") || "").toLowerCase();
-    var label = (button.getAttribute("aria-label") || "").toLowerCase();
-    var titled = button.querySelector("svg title");
-    var title = titled && titled.textContent ? titled.textContent.toLowerCase() : "";
-    var mic = name.indexOf("mic") !== -1 || label.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 ||
-      title.indexOf("mic") !== -1 || title.indexOf("mute") !== -1;
-    return mic ? button : null;
-  }
-  document.addEventListener("pointercancel", function () {
-    micTap += 1;
-  }, true);
-  document.addEventListener("pointerup", function (event) {
-    if (!event || event.pointerType === "mouse") return;
-    var button = callMicButton(event.target);
-    if (!button || button.disabled || button.getAttribute("aria-disabled") === "true") return;
-    var token = micTap + 1;
-    micTap = token;
-    window.setTimeout(function () {
-      if (micTap !== token) return;
-      micTap += 1;
-      button.dispatchEvent(new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        detail: 1,
-        button: 0,
-        clientX: event.clientX,
-        clientY: event.clientY,
-      }));
-    }, 280);
-  }, true);
-  document.addEventListener("click", function (event) {
-    if (callMicButton(event.target)) micTap += 1;
-  }, false);
-
   window.addEventListener("message", function (event) {
-    if (event.source !== window || !event.data || event.data.whatsweb !== "call") return;
+    if (event.source !== window || !event.data) return;
+    if (event.data.whatsweb !== "call") return;
     var data = event.data;
     var value = null;
     try {

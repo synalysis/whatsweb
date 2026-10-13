@@ -90,7 +90,9 @@ fun WhatswebApp(
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         }
-        if (state.linked == false && !locked) {
+        // The screen turning off pauses the page, and that drops a call. Stay
+        // awake for the call, and also while the link code is on screen.
+        if (state.onCall || (state.linked == false && !locked)) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

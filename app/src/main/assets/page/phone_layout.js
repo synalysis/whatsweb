@@ -280,6 +280,20 @@
     "html[data-whatsweb-call='1'] video {",
     "  pointer-events: none !important;",
     "}",
+    "html[data-whatsweb-call='1'] video[data-whatsweb-stand='1'] {",
+    "  width: 100% !important;",
+    "  height: 78vh !important;",
+    "  max-width: none !important;",
+    "  max-height: none !important;",
+    "  min-height: 78vh !important;",
+    "  object-fit: cover !important;",
+    "}",
+    "html[data-whatsweb-call='1'] :not(video)[data-whatsweb-stand='1'] {",
+    "  height: 78vh !important;",
+    "  max-height: none !important;",
+    "  min-height: 78vh !important;",
+    "  overflow: hidden !important;",
+    "}",
     "html[data-whatsweb='phone'] [role='dialog'] {",
     "  box-sizing: border-box !important;",
     "  min-width: 0 !important;",
@@ -1243,11 +1257,28 @@
     var button = document.querySelector(
       "[data-testid='download-native-client-button'], [data-testid='download-native-client-button-inline']"
     );
+    if (!button) {
+      var nodes = document.querySelectorAll("a, button, span");
+      for (var i = 0; i < nodes.length; i++) {
+        var text = (nodes[i].textContent || "").replace(/\s+/g, " ").trim().toLowerCase();
+        if (text.indexOf("whatsapp for windows") === -1 || text.length > 80) continue;
+        var box = nodes[i].getBoundingClientRect();
+        if (box.height < 8 || box.top < window.innerHeight * 0.5) continue;
+        button = nodes[i];
+        break;
+      }
+    }
     if (!button) return;
     var el = button;
     var banner = null;
     while (el && el !== document.body) {
       if (el.querySelector("canvas") || el.querySelector("#link-device-instructions-list")) break;
+      if (el.id === "pane-side" || el.id === "side") break;
+      var parent = el.parentElement;
+      if (parent) {
+        var parentBox = parent.getBoundingClientRect();
+        if (parentBox.height > 160 && parentBox.height > el.getBoundingClientRect().height + 40) break;
+      }
       banner = el;
       el = el.parentElement;
     }
@@ -1564,11 +1595,67 @@
     return !!button.parentElement.querySelector("[aria-haspopup]");
   }
 
+  function iconAttr(button) {
+    if (!button || !button.querySelector) return "";
+    var icon = button.querySelector("[data-icon]");
+    var name = icon && icon.getAttribute("data-icon");
+    return name ? name.toLowerCase() : "";
+  }
+
+  function besideComposer(button) {
+    var node = button && button.parentElement;
+    var guard = 0;
+    while (node && guard < 4) {
+      var box = node.querySelector("[contenteditable='true'], textarea, [role='textbox']");
+      if (box) {
+        var rect = box.getBoundingClientRect();
+        if (rect.width > 8 && rect.height > 8) return true;
+      }
+      node = node.parentElement;
+      guard++;
+    }
+    return false;
+  }
+
+  // Mute icons stay the same in every language. The voice-note button uses the
+  // same mic icon, and it sits beside the message box.
+  function isMuteButton(button) {
+    var icon = iconAttr(button);
+    if (!icon || icon.indexOf("ptt") !== -1) return false;
+    if (icon.indexOf("mic") === -1 && icon.indexOf("mute") === -1) return false;
+    return !besideComposer(button);
+  }
+
+  function livePreview(el) {
+    if (!el || el.getAttribute("data-whatsweb-camera")) return false;
+    var stream = el.srcObject;
+    if (!stream || !stream.getVideoTracks || !stream.getVideoTracks().length) return false;
+    var track = stream.getVideoTracks()[0];
+    if (!track || track.readyState === "ended") return false;
+    var box = el.getBoundingClientRect();
+    if (box.width < window.innerWidth * 0.5 || box.height < 64) return false;
+    if (box.bottom < 0 || box.top > window.innerHeight) return false;
+    return true;
+  }
+
+  function wideCallPicture(el) {
+    if (livePreview(el)) return true;
+    if (!el || el.getAttribute("data-whatsweb-camera")) return false;
+    var box = el.getBoundingClientRect();
+    if (box.width < window.innerWidth * 0.62 || box.height < 48) return false;
+    if (box.width > window.innerWidth * 0.7 && box.height > window.innerHeight * 0.4) return true;
+    return box.width > box.height && box.top < window.innerHeight * 0.35 && box.height > window.innerHeight * 0.16;
+  }
+
   function callOnScreen() {
-    var videos = document.querySelectorAll("video");
-    for (var i = 0; i < videos.length; i++) {
-      var box = videos[i].getBoundingClientRect();
-      if (box.width > window.innerWidth * 0.7 && box.height > window.innerHeight * 0.4) return true;
+    var held = document.querySelector("[data-whatsweb-stand='1']");
+    if (held) {
+      var heldBox = held.getBoundingClientRect();
+      if (heldBox.width > 40 && heldBox.height > 40) return true;
+    }
+    var pictures = document.querySelectorAll("video");
+    for (var i = 0; i < pictures.length; i++) {
+      if (wideCallPicture(pictures[i])) return true;
     }
     var buttons = document.querySelectorAll("button, [role='button']");
     for (var b = 0; b < buttons.length; b++) {
@@ -1576,18 +1663,96 @@
       var rect = buttonVisible(button);
       if (!rect) continue;
       if (isEndCall(button) || isCallMic(button)) return true;
-      var icon = iconName(button);
-      var label = (button.getAttribute("aria-label") || "").toLowerCase();
-      var mic = icon.indexOf("mic") !== -1 || label.indexOf("mute") !== -1 || label.indexOf("microphone") !== -1;
-      if (mic && rect.top >= window.innerHeight * 0.45) return true;
+      if (rect.top >= window.innerHeight * 0.45 && isMuteButton(button)) return true;
     }
     return false;
+  }
+
+  function clearStand(el) {
+    if (!el || el.dataset.whatswebStand !== "1") return;
+    el.style.width = "";
+    el.style.height = "";
+    el.style.maxHeight = "";
+    el.style.objectFit = "";
+    delete el.dataset.whatswebStand;
+  }
+
+  function clearStandAll() {
+    var marked = document.querySelectorAll("[data-whatsweb-stand='1']");
+    for (var i = 0; i < marked.length; i++) clearStand(marked[i]);
+  }
+
+  function standCallVideo() {
+    var call = document.documentElement.dataset.whatswebCall === "1";
+    var portraitWindow = window.innerHeight > window.innerWidth;
+    if (!call || !portraitWindow) {
+      clearStandAll();
+      return;
+    }
+    var pictures = document.querySelectorAll("video");
+    var chosen = null;
+    var chosenArea = 0;
+    for (var i = 0; i < pictures.length; i++) {
+      var picture = pictures[i];
+      if (!wideCallPicture(picture)) continue;
+      var box = picture.getBoundingClientRect();
+      var area = box.width * box.height;
+      if (area > chosenArea) {
+        chosen = picture;
+        chosenArea = area;
+      }
+    }
+    clearStandAll();
+    if (!chosen) return;
+    chosen.dataset.whatswebStand = "1";
+    var node = chosen.parentElement;
+    var guard = 0;
+    while (node && node !== document.body && node !== document.documentElement && guard < 4) {
+      var rect = node.getBoundingClientRect();
+      if (rect.width < window.innerWidth * 0.5) break;
+      node.dataset.whatswebStand = "1";
+      node = node.parentElement;
+      guard++;
+    }
+  }
+
+  function emulatorPreview() {
+    if (document.documentElement.dataset.whatswebCameraFlip === "0") return true;
+    try { return window.top.sessionStorage.getItem("whatswebCameraFlip") === "0"; } catch (error) {}
+    return false;
+  }
+
+  // The phone self-view is mirrored on purpose. The emulator camera is not a
+  // front camera, so that same mirror turns the picture over. Undo it there.
+  function straightenEmulatorPreview() {
+    var emulator = emulatorPreview();
+    var videos = document.querySelectorAll("video");
+    for (var i = 0; i < videos.length; i++) {
+      var video = videos[i];
+      if (!emulator) {
+        if (video.dataset.whatswebUnmirror === "1") {
+          video.style.removeProperty("transform");
+          delete video.dataset.whatswebUnmirror;
+        }
+        continue;
+      }
+      var transform = window.getComputedStyle(video).transform;
+      var match = transform && transform !== "none" && /matrix\(([^)]+)\)/.exec(transform);
+      if (!match) continue;
+      var parts = match[1].split(",");
+      if (parseFloat(parts[0]) < -0.5 || parseFloat(parts[3]) < -0.5) {
+        video.style.setProperty("transform", "none", "important");
+        video.dataset.whatswebUnmirror = "1";
+      }
+    }
   }
 
   function placeCallChrome() {
     var active = callOnScreen();
     if (active) document.documentElement.dataset.whatswebCall = "1";
     else delete document.documentElement.dataset.whatswebCall;
+    standCallVideo();
+    straightenEmulatorPreview();
     if (window.__whatswebSetDomCall) window.__whatswebSetDomCall(active);
   }
 
@@ -1720,7 +1885,9 @@
     if (closeInfoDrawer()) return true;
     if (document.documentElement.dataset.pane === "chat") {
       document.documentElement.dataset.pane = "list";
+      placeCallChrome();
       layoutPanes();
+      followPage();
       window.dispatchEvent(new Event("resize"));
       reportPane();
       return true;

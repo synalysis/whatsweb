@@ -1,6 +1,10 @@
 (function () {
+  function parentNode() {
+    return document.documentElement || document.head;
+  }
+
   function inject(file) {
-    var parent = document.documentElement || document.head;
+    var parent = parentNode();
     if (!parent) return;
     var script = document.createElement("script");
     script.src = browser.runtime.getURL(file);
@@ -8,15 +12,14 @@
     parent.appendChild(script);
   }
 
-  // Page-world copies. The manifest also requests the main world; this still
-  // runs if that request is ignored, and a second run is harmless.
   inject("host.js");
   inject("desktop_identity.js");
+  if (window.top !== window) return;
 
   var port = browser.runtime.connectNative("whatsweb");
 
   window.addEventListener("message", function (event) {
-    if (event.source !== window || !event.data) return;
+    if (event.source !== window || !event.data || event.origin !== window.location.origin) return;
     if (event.data.whatsweb === "host") {
       port.postMessage({ host: String(event.data.payload) });
     } else if (event.data.whatsweb === "result") {
@@ -37,6 +40,11 @@
       root.dataset.whatswebTabChats = message.tabChats || "";
       root.dataset.whatswebTabUpdates = message.tabUpdates || "";
       root.dataset.whatswebTabCalls = message.tabCalls || "";
+      if (message.cameraFlip != null) {
+        var cameraFlip = message.cameraFlip ? "1" : "0";
+        root.dataset.whatswebCameraFlip = cameraFlip;
+        try { sessionStorage.setItem("whatswebCameraFlip", cameraFlip); } catch (error) {}
+      }
       inject("phone_layout.js");
       return;
     }

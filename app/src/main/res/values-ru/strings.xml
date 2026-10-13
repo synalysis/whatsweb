@@ -24,6 +24,12 @@
     <string name="cd_back">Назад</string>
     <string name="cd_reload">Обновить</string>
 
+    <string name="audio_earpiece">Телефон</string>
+    <string name="audio_speaker">Динамик</string>
+    <string name="audio_headset">Гарнитура</string>
+    <string name="audio_bluetooth">Bluetooth</string>
+    <string name="cd_audio_route">Звук вызова, %1$s</string>
+
     <string name="exit_again">Нажми «Назад» ещё раз, чтобы выйти</string>
     <string name="error_offline">Компаньон сейчас недоступен.</string>
     <string name="error_retry">Повторить</string>
@@ -85,9 +91,6 @@
     <string name="about_license">Лицензия GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Независимо от WhatsApp. Сама страница — официальный компаньон WhatsApp Web.</string>
     <string name="about_notifications">Фоновые уведомления недоступны. Это приложение не запускает push-службу WhatsApp.</string>
-    <string name="screen_share_active">Ты показываешь свой экран</string>
-    <string name="screen_share_stop">Остановить</string>
-
     <string name="lock_title">Разблокировать WhatsWeb</string>
     <string name="lock_subtitle">Подтверди, что это ты, чтобы показать компаньон.</string>
     <string name="lock_button">Разблокировать</string>

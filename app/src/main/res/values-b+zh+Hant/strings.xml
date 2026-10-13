@@ -24,6 +24,12 @@
     <string name="cd_back">返回</string>
     <string name="cd_reload">重新載入</string>
 
+    <string name="audio_earpiece">聽筒</string>
+    <string name="audio_speaker">揚聲器</string>
+    <string name="audio_headset">耳機</string>
+    <string name="audio_bluetooth">藍牙</string>
+    <string name="cd_audio_route">通話聲音，%1$s</string>
+
     <string name="exit_again">再按一次返回即可離開</string>
     <string name="error_offline">現在無法連線到夥伴。</string>
     <string name="error_retry">重試</string>
@@ -85,9 +91,6 @@
     <string name="about_license">以 GPL-3.0-or-later 授權。</string>
     <string name="about_disclaimer">獨立於 WhatsApp。頁面本身是官方的 WhatsApp 網頁版。</string>
     <string name="about_notifications">沒有背景提醒。此應用程式不執行 WhatsApp 的推播服務。</string>
-    <string name="screen_share_active">正在分享你的螢幕</string>
-    <string name="screen_share_stop">停止</string>
-
     <string name="lock_title">解鎖 WhatsWeb</string>
     <string name="lock_subtitle">確認是你本人後才會顯示夥伴。</string>
     <string name="lock_button">解鎖</string>

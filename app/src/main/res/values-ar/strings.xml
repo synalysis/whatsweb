@@ -24,6 +24,12 @@
     <string name="cd_back">رجوع</string>
     <string name="cd_reload">إعادة التحميل</string>
 
+    <string name="audio_earpiece">سماعة الأذن</string>
+    <string name="audio_speaker">مكبر الصوت</string>
+    <string name="audio_headset">سماعة الرأس</string>
+    <string name="audio_bluetooth">بلوتوث</string>
+    <string name="cd_audio_route">صوت المكالمة، %1$s</string>
+
     <string name="exit_again">اضغط رجوع مرة أخرى للمغادرة</string>
     <string name="error_offline">يتعذر الوصول إلى الرفيق الآن.</string>
     <string name="error_retry">إعادة المحاولة</string>
@@ -85,9 +91,6 @@
     <string name="about_license">مرخّص بموجب GPL-3.0-or-later.</string>
     <string name="about_disclaimer">مستقل عن واتساب. الصفحة نفسها هي رفيق واتساب ويب الرسمي.</string>
     <string name="about_notifications">التنبيهات في الخلفية غير متاحة. هذا التطبيق لا يشغّل خدمة الدفع من واتساب.</string>
-    <string name="screen_share_active">تتم مشاركة شاشتك</string>
-    <string name="screen_share_stop">إيقاف</string>
-
     <string name="lock_title">فتح قفل WhatsWeb</string>
     <string name="lock_subtitle">أكّد أنك أنت لعرض الرفيق.</string>
     <string name="lock_button">فتح القفل</string>

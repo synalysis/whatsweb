@@ -80,8 +80,6 @@ private class GeckoCompanionPage(
     private var nextId = 1
     private val pending = HashMap<Int, (String) -> Unit>()
     private var currentUrl: String? = null
-    private var expectingScreen = false
-
     private val portDelegate = object : WebExtension.PortDelegate {
         override fun onPortMessage(message: Any, port: WebExtension.Port) {
             val json = message as? JSONObject ?: return
@@ -211,21 +209,25 @@ private class GeckoCompanionPage(
                     callback.reject()
                     return
                 }
-                val chosenVideo = chooseVideo(video)
-                val chosenAudio = chooseAudio(audio, screen = chosenVideo?.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_SCREEN)
+                val cameraSource = GeckoSession.PermissionDelegate.MediaSource.SOURCE_CAMERA
+                val microphoneSource = GeckoSession.PermissionDelegate.MediaSource.SOURCE_MICROPHONE
+                val videos = video.orEmpty()
+                val audios = audio.orEmpty()
+                val chosenVideo = videos.firstOrNull { it.source == cameraSource }
+                val chosenAudio = audios.firstOrNull { it.source == microphoneSource }
+                val videoOk = videos.all { it.source == cameraSource }
+                val audioOk = audios.all { it.source == microphoneSource }
+                if (!videoOk || !audioOk || (chosenVideo == null && chosenAudio == null)) {
+                    callback.reject()
+                    return
+                }
                 main.post {
-                    val grant = {
-                        expectingScreen = chosenVideo?.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_SCREEN ||
-                            chosenAudio?.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_AUDIOCAPTURE
-                        callback.grant(chosenVideo, chosenAudio)
-                    }
-                    val camera = chosenVideo?.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_CAMERA
-                    val microphone = chosenAudio?.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_MICROPHONE
-                    if (!camera && !microphone) {
-                        grant()
-                        return@post
-                    }
-                    host.requestCapture(camera, microphone, grant, { callback.reject() })
+                    host.requestCapture(
+                        chosenVideo != null,
+                        chosenAudio != null,
+                        { callback.grant(chosenVideo, chosenAudio) },
+                        callback::reject,
+                    )
                 }
             }
         }
@@ -268,22 +270,8 @@ private class GeckoCompanionPage(
             main.post {
                 host.startForResult(
                     pending,
-                    { data ->
-                        if (expectingScreen) {
-                            expectingScreen = false
-                            ScreenShareService.start(
-                                app,
-                                { result.complete(data) },
-                                { result.completeExceptionally(IllegalStateException("screen share unavailable")) },
-                            )
-                        } else {
-                            result.complete(data)
-                        }
-                    },
-                    {
-                        expectingScreen = false
-                        result.completeExceptionally(IllegalStateException("cancelled"))
-                    },
+                    { data -> result.complete(data) },
+                    { result.completeExceptionally(IllegalStateException("cancelled")) },
                 )
             }
             result
@@ -406,37 +394,12 @@ private class GeckoCompanionPage(
     }
 
     override fun destroy() {
-        expectingScreen = false
         runtime.activityDelegate = null
-        ScreenShareService.stop(app)
         try {
             session.close()
         } catch (_: Exception) {
         }
         slot.destroy(null)
-    }
-
-    private fun chooseVideo(
-        sources: Array<GeckoSession.PermissionDelegate.MediaSource>?,
-    ): GeckoSession.PermissionDelegate.MediaSource? {
-        if (sources.isNullOrEmpty()) return null
-        return sources.firstOrNull { it.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_SCREEN }
-            ?: sources.firstOrNull { it.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_CAMERA }
-            ?: sources.first()
-    }
-
-    private fun chooseAudio(
-        sources: Array<GeckoSession.PermissionDelegate.MediaSource>?,
-        screen: Boolean,
-    ): GeckoSession.PermissionDelegate.MediaSource? {
-        if (sources.isNullOrEmpty()) return null
-        if (screen) {
-            return sources.firstOrNull { it.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_AUDIOCAPTURE }
-                ?: sources.firstOrNull { it.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_MICROPHONE }
-                ?: sources.first()
-        }
-        return sources.firstOrNull { it.source == GeckoSession.PermissionDelegate.MediaSource.SOURCE_MICROPHONE }
-            ?: sources.first()
     }
 
     private fun allowStoredNotifications() {
@@ -475,8 +438,38 @@ private class GeckoCompanionPage(
                 .put("hideCalls", false)
                 .put("tabChats", app.getString(com.synalysis.whatsweb.R.string.tab_chats))
                 .put("tabUpdates", app.getString(com.synalysis.whatsweb.R.string.tab_updates))
-                .put("tabCalls", app.getString(com.synalysis.whatsweb.R.string.tab_calls)),
+                .put("tabCalls", app.getString(com.synalysis.whatsweb.R.string.tab_calls))
+                .put("cameraFlip", !emulatorCamera()),
         )
+    }
+}
+
+private fun emulatorCamera(): Boolean {
+    val fingerprint = android.os.Build.FINGERPRINT.lowercase()
+    val model = android.os.Build.MODEL.lowercase()
+    val hardware = android.os.Build.HARDWARE.lowercase()
+    val product = android.os.Build.PRODUCT.lowercase()
+    return fingerprint.startsWith("generic") ||
+        fingerprint.contains("emulator") ||
+        model.contains("emulator") ||
+        model.contains("android sdk") ||
+        hardware.contains("goldfish") ||
+        hardware.contains("ranchu") ||
+        product.contains("sdk")
+}
+
+private fun enableCallMedia() {
+    listOf(
+        "media.setsinkid.enabled",
+    ).forEach { name ->
+        try {
+            GeckoPreferenceController.setGeckoPref(
+                name,
+                true,
+                GeckoPreferenceController.PREF_BRANCH_USER,
+            ).accept({ _ -> }, { _ -> })
+        } catch (_: Throwable) {
+        }
     }
 }
 
@@ -490,17 +483,12 @@ private fun runtime(context: Context): GeckoRuntime {
         .consoleOutput(false)
     EngineProfiles.profileArguments(context)?.let { builder.arguments(it) }
     val settings = builder.build()
+    enableCallMedia()
     return GeckoRuntime.create(context, settings).also { created ->
-        // Ask Firefox to list real speakers. Android often still returns none;
-        // the page then supplies the phone's default output.
-        try {
-            GeckoPreferenceController.setGeckoPref(
-                "media.setsinkid.enabled",
-                true,
-                GeckoPreferenceController.PREF_BRANCH_USER,
-            )
-        } catch (_: Throwable) {
-        }
+        // Speaker listing is off in Firefox for Android until this is set.
+        // Apply again after startup in case the first call landed before Gecko
+        // could store it.
+        enableCallMedia()
         val notifications = CompanionNotifications(context)
         NotificationBridge.notifications = notifications
         created.webNotificationDelegate = notifications

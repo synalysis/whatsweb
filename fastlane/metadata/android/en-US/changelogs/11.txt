@@ -1,0 +1,1 @@
+Leaving a chat keeps the tab bar in place. The Windows download banner no longer takes its spot.

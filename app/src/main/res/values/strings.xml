@@ -27,6 +27,12 @@
     <string name="cd_back">Back</string>
     <string name="cd_reload">Reload</string>
 
+    <string name="audio_earpiece">Earpiece</string>
+    <string name="audio_speaker">Speaker</string>
+    <string name="audio_headset">Headset</string>
+    <string name="audio_bluetooth">Bluetooth</string>
+    <string name="cd_audio_route">Call sound, %1$s</string>
+
     <string name="exit_again">Press back again to leave</string>
     <string name="error_offline">The companion can\'t be reached right now.</string>
     <string name="error_retry">Try again</string>
@@ -88,8 +94,6 @@
     <string name="about_license">Licensed under GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Independent of WhatsApp. The page itself is the official WhatsApp Web companion.</string>
     <string name="about_notifications">Background alerts are not available. This app does not run WhatsApp\'s push service.</string>
-    <string name="screen_share_active">Sharing your screen</string>
-    <string name="screen_share_stop">Stop</string>
 
     <string name="lock_title">Unlock WhatsWeb</string>
     <string name="lock_subtitle">Confirm it\'s you to show the companion.</string>

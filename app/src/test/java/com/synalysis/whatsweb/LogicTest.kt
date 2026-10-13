@@ -1,5 +1,6 @@
 package com.synalysis.whatsweb
 
+import android.media.AudioDeviceInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -7,7 +8,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import com.synalysis.whatsweb.web.BlobTransfer
 import com.synalysis.whatsweb.web.ByteStreams
+import com.synalysis.whatsweb.web.CallRoutes
 import com.synalysis.whatsweb.web.DesktopIdentity
+import com.synalysis.whatsweb.web.FoundOutput
 import com.synalysis.whatsweb.web.HostMessages
 import com.synalysis.whatsweb.web.LinkRouter
 import com.synalysis.whatsweb.web.TelemetryBlock
@@ -15,6 +18,42 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Base64
+
+class CallRoutesTest {
+    @Test
+    fun earpieceAndSpeakerAreAlwaysOffered() {
+        val routes = CallRoutes.endpoints(emptyList())
+        assertEquals(listOf(CallRoutes.EARPIECE, CallRoutes.SPEAKER), routes.map { it.id })
+    }
+
+    @Test
+    fun headsetAndBluetoothKeepTheirNames() {
+        val routes = CallRoutes.endpoints(
+            listOf(
+                FoundOutput(AudioDeviceInfo.TYPE_BUILTIN_SPEAKER, 2, ""),
+                FoundOutput(AudioDeviceInfo.TYPE_USB_HEADSET, 9, "USB headset"),
+                FoundOutput(AudioDeviceInfo.TYPE_BLUETOOTH_SCO, 4, "Desk buds"),
+                FoundOutput(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP, 5, "Media only"),
+            ),
+        )
+        assertEquals(
+            listOf(CallRoutes.EARPIECE, CallRoutes.SPEAKER, "wired:9", "bt:4"),
+            routes.map { it.id },
+        )
+        assertEquals("USB headset", routes.first { it.id == "wired:9" }.name)
+        assertEquals("Desk buds", routes.first { it.id == "bt:4" }.name)
+    }
+
+    @Test
+    fun aChoiceStaysUntilThatOutputDisappears() {
+        val routes = CallRoutes.endpoints(
+            listOf(FoundOutput(AudioDeviceInfo.TYPE_BLE_HEADSET, 7, "Buds")),
+        )
+        assertEquals(CallRoutes.SPEAKER, CallRoutes.shown(CallRoutes.SPEAKER, routes, "bt:7"))
+        assertEquals("bt:7", CallRoutes.shown("bt:7", routes, CallRoutes.EARPIECE))
+        assertEquals(CallRoutes.EARPIECE, CallRoutes.shown("bt:7", CallRoutes.endpoints(emptyList()), "bt:7"))
+    }
+}
 
 class LinkRouterTest {
     @Test

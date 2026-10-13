@@ -36,7 +36,7 @@ Install a debug build with `./gradlew installDebug`.
 Tagged releases on the [releases](https://github.com/synalysis/whatsweb/releases) page include signed APKs of the same version.
 
 - [WhatsWeb](https://github.com/synalysis/whatsweb/releases/latest): `WhatsWeb-<version>.apk`
-- [WhatsWeb Calls](https://github.com/synalysis/whatsweb/releases/latest), a separate install with voice and video calls, alerts while the app is open, and screen sharing. Download the file that matches the device:
+- [WhatsWeb Calls](https://github.com/synalysis/whatsweb/releases/latest), a separate install with voice and video calls and alerts while the app is open. Download the file that matches the device:
   - `WhatsWeb-Calls-<version>-arm64-v8a.apk` for current phones
   - `WhatsWeb-Calls-<version>-armeabi-v7a.apk` for older 32-bit phones
   - `WhatsWeb-Calls-<version>-x86_64.apk` for Chromebooks and emulators

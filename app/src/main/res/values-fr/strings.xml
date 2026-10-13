@@ -24,6 +24,12 @@
     <string name="cd_back">Retour</string>
     <string name="cd_reload">Recharger</string>
 
+    <string name="audio_earpiece">Écouteur</string>
+    <string name="audio_speaker">Haut-parleur</string>
+    <string name="audio_headset">Casque</string>
+    <string name="audio_bluetooth">Bluetooth</string>
+    <string name="cd_audio_route">Son de l\'appel, %1$s</string>
+
     <string name="exit_again">Appuie encore sur Retour pour quitter</string>
     <string name="error_offline">Le compagnon est injoignable pour le moment.</string>
     <string name="error_retry">Réessayer</string>
@@ -85,9 +91,6 @@
     <string name="about_license">Sous licence GPL-3.0-or-later.</string>
     <string name="about_disclaimer">Indépendant de WhatsApp. La page elle-même est le compagnon officiel WhatsApp Web.</string>
     <string name="about_notifications">Les alertes en arrière-plan ne sont pas disponibles. Cette application n\'exécute pas le service de notifications de WhatsApp.</string>
-    <string name="screen_share_active">Tu partages ton écran</string>
-    <string name="screen_share_stop">Arrêter</string>
-
     <string name="lock_title">Déverrouiller WhatsWeb</string>
     <string name="lock_subtitle">Confirme que c\'est bien toi pour afficher le compagnon.</string>
     <string name="lock_button">Déverrouiller</string>

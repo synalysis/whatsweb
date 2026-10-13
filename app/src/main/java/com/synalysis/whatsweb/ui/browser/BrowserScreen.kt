@@ -1,6 +1,8 @@
 package com.synalysis.whatsweb.ui.browser
 
+import android.Manifest
 import android.content.ClipData
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,6 +11,8 @@ import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +39,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -76,6 +83,26 @@ fun BrowserScreen(
     var hintDismissed by remember { mutableStateOf(false) }
     val clipboard = LocalClipboard.current
     val copiedMessage = stringResource(R.string.share_copied)
+    val context = LocalContext.current
+    val callAudio = remember { CallAudio(context) }
+    val connectPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        callAudio.onBluetoothResult(granted)
+    }
+    SideEffect {
+        callAudio.requestBluetooth = {
+            if (Build.VERSION.SDK_INT >= 31) {
+                connectPermission.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            } else {
+                callAudio.onBluetoothResult(true)
+            }
+        }
+    }
+    DisposableEffect(state.onCall) {
+        callAudio.setActive(state.onCall)
+        onDispose { callAudio.setActive(false) }
+    }
 
     LaunchedEffect(state.linked) {
         if (state.linked == true) hintDismissed = false
@@ -265,6 +292,14 @@ fun BrowserScreen(
                         Icons.Filled.Settings,
                         stringResource(R.string.cd_settings),
                         modifier = Modifier.size((24f * prefs.textZoom / 100f).dp),
+                    )
+                }
+                if (state.onCall) {
+                    CallSoundButton(
+                        audio = callAudio,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 8.dp),
                     )
                 }
             }

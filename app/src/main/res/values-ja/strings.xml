@@ -24,6 +24,12 @@
     <string name="cd_back">戻る</string>
     <string name="cd_reload">再読み込み</string>
 
+    <string name="audio_earpiece">受話口</string>
+    <string name="audio_speaker">スピーカー</string>
+    <string name="audio_headset">ヘッドセット</string>
+    <string name="audio_bluetooth">Bluetooth</string>
+    <string name="cd_audio_route">通話の音声、%1$s</string>
+
     <string name="exit_again">終了するには、もう一度戻るを押してください</string>
     <string name="error_offline">今は相棒に接続できません。</string>
     <string name="error_retry">もう一度試す</string>
@@ -85,9 +91,6 @@
     <string name="about_license">GPL-3.0-or-later でライセンスされています。</string>
     <string name="about_disclaimer">WhatsApp とは独立しています。ページそのものは公式の WhatsApp Web です。</string>
     <string name="about_notifications">バックグラウンド通知はありません。このアプリは WhatsApp のプッシュサービスを実行しません。</string>
-    <string name="screen_share_active">画面を共有しています</string>
-    <string name="screen_share_stop">停止</string>
-
     <string name="lock_title">WhatsWeb のロックを解除</string>
     <string name="lock_subtitle">本人確認後に相棒を表示します。</string>
     <string name="lock_button">ロック解除</string>
