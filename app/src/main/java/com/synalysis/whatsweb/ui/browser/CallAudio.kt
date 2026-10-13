@@ -159,6 +159,7 @@ internal class CallAudio(context: Context) {
         sco(manager, false)
     }
 
+    @RequiresApi(31)
     private fun communicationDevice(manager: AudioManager, id: String, kind: AudioKind): AudioDeviceInfo? {
         val devices = manager.availableCommunicationDevices
         return when (kind) {
